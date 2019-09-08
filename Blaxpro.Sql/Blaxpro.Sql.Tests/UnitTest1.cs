@@ -9,14 +9,13 @@ namespace Blaxpro.Sql.Tests
 {
     public class UnitTest1
     {
-        private static Product[] initialProducts = new[]
+        private readonly static Product[] initialProducts = new[]
         {
             new Product { Name = "bread", Price = 0.95m},
             new Product { Name = "milk",  Price = 1.34m},
             new Product { Name = "water", Price = 0.99m},
             new Product { Name = "wine",  Price = 13.21m},
         };
-
 
         [Fact]
         public void Test1()
