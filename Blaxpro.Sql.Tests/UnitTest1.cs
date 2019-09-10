@@ -1,7 +1,14 @@
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using Blaxpro.Sql.Extensions.DbTransactions;
+using Xunit;
 
 namespace Blaxpro.Sql.Tests
 {
+
     public class UnitTest1
     {
         private readonly static Product[] initialProducts = new[]
@@ -14,7 +21,7 @@ namespace Blaxpro.Sql.Tests
 
         private static IDbConnection prv_getConnection()
         {
-            return new SqlConnection("");
+            return new SqlConnection(@"Data Source=(localdb)\v11.0;Initial Catalog=blaxpro-sql-tests;Integrated Security=True;Pooling=False");
         }
 
         [Fact]
@@ -26,45 +33,42 @@ namespace Blaxpro.Sql.Tests
 
             using (ITransaction transaction = db.transact())
             {
-                IQuery updateQuery, insertQuery;
-                IEnumerable<Product> products;
+                try
+                {
+                    transaction.createProductsTable();
+                    transaction.saveChanges();
+                }
+                catch (Exception ex)
+                {
+                }
+            }
 
-                transaction
-                    .beginQuery("DELETE * FROM product")
-                    .write();
+            using (ITransaction transaction = db.transact())
+            {
+                IList<Product> products;
 
-                insertQuery = transaction.beginQuery("INSERT INTO product (name, price) VALUES (@name, @price)");
+                transaction.deleteProducts();
 
                 foreach (var p in initialProducts)
                 {
                     int affectedRows;
 
-                    affectedRows = insertQuery
-                        .setParameters(p)
-                        .write();
+                    affectedRows = transaction.insertProduct(p);
 
                     Assert.Equal(1, affectedRows);
                 }
 
                 products = transaction
-                    .beginQuery(@"SELECT * FROM product WHERE @minPrice <= product.price AND product.price <= @maxPrice")
-                    .setParameters(new
-                    {
-                        minPrice = 100,
-                        maxPrice = 200,
-                    })
-                    .read<Product>()
+                    .getProductsByPriceRange(1, 20)
                     .ToList();
 
-                updateQuery = transaction.beginQuery("UPDATE product SET name = @name");
+                Assert.Equal(2, products.Count);
 
-                foreach (Product product in products)
+                foreach (Product p in products)
                 {
                     int affectedRows;
 
-                    affectedRows = updateQuery
-                        .setParameters(new { name = $"updated_{product.Name}" })
-                        .write();
+                    affectedRows = transaction.updateProductName(p.Id, $"updated_{p.Name}");
 
                     Assert.Equal(1, affectedRows);
                 }
