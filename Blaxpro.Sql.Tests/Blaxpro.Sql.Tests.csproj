@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Blaxpro.Sql\Blaxpro.Sql.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="netstandard">
+      <HintPath>..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\netstandard.library\2.0.3\build\netstandard2.0\ref\netstandard.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

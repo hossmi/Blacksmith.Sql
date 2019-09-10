@@ -1,9 +1,4 @@
-using Blaxpro.Sql.Models;
-using Blaxpro.Sql.Extensions;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using Xunit;
-using System.Linq;
+using System.Data;
 
 namespace Blaxpro.Sql.Tests
 {
@@ -17,12 +12,17 @@ namespace Blaxpro.Sql.Tests
             new Product { Name = "wine",  Price = 13.21m},
         };
 
-        [Fact]
-        public void Test1()
+        private static IDbConnection prv_getConnection()
         {
-            IDb<SqlConnection> db;
+            return new SqlConnection("");
+        }
 
-            db = new Db<SqlConnection>("");
+        [Fact]
+        public void test1()
+        {
+            IDb db;
+
+            db = new Db(prv_getConnection);
 
             using (ITransaction transaction = db.transact())
             {

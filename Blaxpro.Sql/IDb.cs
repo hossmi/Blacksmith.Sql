@@ -1,8 +1,6 @@
-﻿using System.Data;
-
-namespace Blaxpro.Sql
+﻿namespace Blaxpro.Sql
 {
-    public interface IDb<T> where T : class, IDbConnection, new()
+    public interface IDb
     {
         ITransaction transact();
     }
