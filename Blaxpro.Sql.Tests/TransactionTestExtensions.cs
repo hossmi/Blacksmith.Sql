@@ -54,7 +54,7 @@ WHERE @minPrice <= products.price
             return transaction.set(query);
         }
 
-        public static int updateProductName(this ITransaction transaction, int productId, string name)
+        public static int updateProductName(this ITransaction transaction, long productId, string name)
         {
             Query query;
 
@@ -78,7 +78,7 @@ WHERE id = @id";
         {
             return new Product
             {
-                Id = (int)r["id"],
+                Id = (long)r["id"],
                 Name = (string)r["name"],
                 Price = (decimal)r["price"],
             };

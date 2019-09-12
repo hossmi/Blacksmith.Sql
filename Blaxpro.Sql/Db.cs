@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using Blaxpro.Sql.Exceptions;
 using Blaxpro.Sql.Extensions.DbCommands;
 using Blaxpro.Sql.Models;
@@ -61,7 +60,7 @@ namespace Blaxpro.Sql
 
             public IEnumerable<IDataRecord> get(IQuery query)
             {
-                return prv_transact(query, prv_getTransaction(), DBCommandExtensions.getRecords);
+                return prv_transact(query, prv_getTransaction());
             }
 
             public object getValue(IQuery query)
@@ -116,6 +115,31 @@ namespace Blaxpro.Sql
                         throw new DbCommandExecutionException(ex);
                     }
                     return result;
+                }
+            }
+
+            private static IEnumerable<IDataRecord> prv_transact(IQuery query, IDbTransaction transaction)
+            {
+                using (IDbCommand command = transaction.Connection.CreateCommand())
+                {
+                    IDataReader reader;
+
+                    command.Transaction = transaction;
+                    command.CommandText = query.Statement;
+                    command.setParameters(query.Parameters);
+
+                    try
+                    {
+                        reader = command.ExecuteReader();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new DbCommandExecutionException(ex);
+                    }
+
+                    while (reader.Read())
+                        yield return reader;
+                    reader.Close();
                 }
             }
         }
