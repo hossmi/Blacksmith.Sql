@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using Blaxpro.Sql.Exceptions;
 using Blaxpro.Sql.Extensions.DbTransactions;
 using Xunit;
 
@@ -38,7 +39,7 @@ namespace Blaxpro.Sql.Tests
                     transaction.createProductsTable();
                     transaction.saveChanges();
                 }
-                catch (Exception ex)
+                catch (DbCommandExecutionException ex)
                 {
                 }
             }

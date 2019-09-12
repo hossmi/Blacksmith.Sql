@@ -5,6 +5,13 @@ namespace Blaxpro.Sql.Extensions.DbCommands
 {
     public static class DBCommandExtensions
     {
+        public static IEnumerable<IDataRecord> getRecords(this IDbCommand command)
+        {
+            using (IDataReader reader = command.ExecuteReader())
+                while (reader.Read())
+                    yield return reader;
+        }
+
         public static T setParameters<T>(this T command, IEnumerable<KeyValuePair<string, object>> parameters)
             where T: class, IDbCommand
         {

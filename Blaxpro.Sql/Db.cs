@@ -48,16 +48,6 @@ namespace Blaxpro.Sql
                 this.disposed = true;
             }
 
-            public IEnumerable<IDataRecord> get(IQuery query)
-            {
-                return prv_transact(query, prv_executeReader);
-            }
-
-            public object getValue(IQuery query)
-            {
-                return prv_transact(query, command => command.ExecuteNonQuery());
-            }
-
             public void saveChanges()
             {
                 if (this.transaction == null)
@@ -68,25 +58,19 @@ namespace Blaxpro.Sql
                 this.transaction = null;
             }
 
-            public int set(IQuery query)
+            public IEnumerable<IDataRecord> get(IQuery query)
             {
-                return prv_transact(query, c => c.ExecuteNonQuery());
+                return prv_transact(query, prv_getTransaction(), DBCommandExtensions.getRecords);
             }
 
-            private T prv_transact<T>(IQuery query, Func<IDbCommand, T> commandExecutor)
+            public object getValue(IQuery query)
             {
-                IDbTransaction transaction;
+                return prv_transact(query, prv_getTransaction(), c => c.ExecuteScalar());
+            }
 
-                transaction = prv_getTransaction();
-
-                using (IDbCommand command = transaction.Connection.CreateCommand())
-                {
-                    command.Transaction = transaction;
-                    command.CommandText = query.Statement;
-                    command.setParameters(query.Parameters);
-
-                    return commandExecutor(command);
-                }
+            public int set(IQuery query)
+            {
+                return prv_transact(query, prv_getTransaction(), c => c.ExecuteNonQuery());
             }
 
             private IDbTransaction prv_getTransaction()
@@ -96,7 +80,14 @@ namespace Blaxpro.Sql
                     this.connection = this.connectionBuilder()
                         ?? throw new DbTransactionException("Null returned connection calling connectionBuilder delegate.");
 
-                    this.connection.Open();
+                    try
+                    {
+                        this.connection.Open();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new DbTransactionException("Error connecting to data base.", ex);
+                    }
                 }
 
                 if (this.transaction == null)
@@ -105,13 +96,27 @@ namespace Blaxpro.Sql
                 return this.transaction;
             }
 
-            private static IEnumerable<IDataRecord> prv_executeReader(IDbCommand command)
+            private static T prv_transact<T>(IQuery query, IDbTransaction transaction, Func<IDbCommand, T> commandExecutor)
             {
-                using (IDataReader reader = command.ExecuteReader())
-                    while (reader.Read())
-                        yield return reader;
-            }
+                using (IDbCommand command = transaction.Connection.CreateCommand())
+                {
+                    T result;
 
+                    command.Transaction = transaction;
+                    command.CommandText = query.Statement;
+                    command.setParameters(query.Parameters);
+
+                    try
+                    {
+                        result = commandExecutor(command);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new DbCommandExecutionException(ex);
+                    }
+                    return result;
+                }
+            }
         }
     }
 }
