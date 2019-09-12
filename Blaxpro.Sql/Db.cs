@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Blaxpro.Sql.Exceptions;
 using Blaxpro.Sql.Extensions.DbCommands;
 using Blaxpro.Sql.Models;
