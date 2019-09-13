@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Blaxpro.Sql.Models;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Blaxpro.Sql.Models;
 using Blaxpro.Sql.Extensions.Queries;
 using Blaxpro.Sql.Extensions.DbTransactions;
 
@@ -9,6 +9,11 @@ namespace Blaxpro.Sql.Tests
 {
     public static class SqliteTransactionExtensions
     {
+        public static int dropSqliteProductsTable(this ITransaction transaction)
+        {
+            return transaction.set(@"DROP TABLE products;");
+        }
+
         public static int createSqliteProductsTable(this ITransaction transaction)
         {
             Query query;
@@ -23,6 +28,5 @@ CREATE TABLE products
 
             return transaction.set(query);
         }
-
     }
 }

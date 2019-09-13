@@ -48,6 +48,7 @@ namespace Blaxpro.Sql.Tests
             {
                 try
                 {
+                    transaction.dropProductsTable();
                     transaction.createProductsTable();
                     transaction.saveChanges();
                 }
@@ -102,6 +103,7 @@ namespace Blaxpro.Sql.Tests
             {
                 try
                 {
+                    transaction.dropProductsTable();
                     transaction.createSqliteProductsTable();
                 }
                 catch (DbCommandExecutionException ex)

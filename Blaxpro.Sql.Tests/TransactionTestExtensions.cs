@@ -9,6 +9,11 @@ namespace Blaxpro.Sql.Tests
 {
     public static class TransactionTestExtensions
     {
+        public static int dropProductsTable(this ITransaction transaction)
+        {
+            return transaction.set(@"DROP TABLE products;");
+        }
+
         public static int createProductsTable(this ITransaction transaction)
         {
             Query query;
@@ -16,7 +21,7 @@ namespace Blaxpro.Sql.Tests
             query = @"
 CREATE TABLE products
 (
-    id int NOT NULL IDENTITY(1,1),
+    id BIGINT NOT NULL IDENTITY(1,1),
     name nvarchar(256) NOT NULL,
     price decimal(10,2) NOT NULL,
     PRIMARY KEY (id)
@@ -78,7 +83,7 @@ WHERE id = @id";
         {
             return new Product
             {
-                Id = (long)r["id"],
+                Id = (int)r["id"],
                 Name = (string)r["name"],
                 Price = (decimal)r["price"],
             };

@@ -8,14 +8,4 @@
     <Version>0.0.1</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="test.sqlite" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="test.sqlite">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>
