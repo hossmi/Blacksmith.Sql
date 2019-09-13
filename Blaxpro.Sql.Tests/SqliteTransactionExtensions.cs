@@ -4,17 +4,21 @@ using System.Data;
 using System.Linq;
 using Blaxpro.Sql.Extensions.Queries;
 using Blaxpro.Sql.Extensions.DbTransactions;
+using System;
+using Blaxpro.Sql.Exceptions;
+using System.Diagnostics;
 
 namespace Blaxpro.Sql.Tests
 {
     public static class SqliteTransactionExtensions
     {
-        public static int dropSqliteProductsTable(this ITransaction transaction)
+        public static IDb createSqliteProductsTable(this IDb db)
         {
-            return transaction.set(@"DROP TABLE products;");
+            prv_migrate(db, prv_createProductsTable);
+            return db;
         }
 
-        public static int createSqliteProductsTable(this ITransaction transaction)
+        private static int prv_createProductsTable(ITransaction transaction)
         {
             Query query;
 
@@ -27,6 +31,22 @@ CREATE TABLE products
 );";
 
             return transaction.set(query);
+        }
+
+        private static void prv_migrate(IDb db, Func<ITransaction, int> transactionDelegate)
+        {
+            using (ITransaction transaction = db.transact())
+            {
+                try
+                {
+                    transactionDelegate(transaction);
+                }
+                catch (DbCommandExecutionException ex)
+                {
+                    Debug.Print(ex.Message);
+                }
+                transaction.saveChanges();
+            }
         }
     }
 }

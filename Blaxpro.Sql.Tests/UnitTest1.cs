@@ -43,20 +43,8 @@ namespace Blaxpro.Sql.Tests
             IDb db;
 
             db = new Db(prv_getSqlServerConnection);
-
-            using (ITransaction transaction = db.transact())
-            {
-                try
-                {
-                    transaction.dropProductsTable();
-                    transaction.createProductsTable();
-                    transaction.saveChanges();
-                }
-                catch (DbCommandExecutionException ex)
-                {
-                    Debug.Print(ex.Message);
-                }
-            }
+            db.dropProductsTable();
+            db.createProductsTable();
 
             using (ITransaction transaction = db.transact())
             {
@@ -98,20 +86,8 @@ namespace Blaxpro.Sql.Tests
             IDb db;
 
             db = new Db(prv_getSqliteConnection);
-
-            using (ITransaction transaction = db.transact())
-            {
-                try
-                {
-                    transaction.dropProductsTable();
-                    transaction.createSqliteProductsTable();
-                }
-                catch (DbCommandExecutionException ex)
-                {
-                    Debug.Print(ex.Message);
-                }
-                transaction.saveChanges();
-            }
+            db.dropProductsTable();
+            db.createSqliteProductsTable();
 
             using (ITransaction transaction = db.transact())
             {

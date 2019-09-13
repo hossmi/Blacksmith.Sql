@@ -4,30 +4,24 @@ using System.Linq;
 using Blaxpro.Sql.Models;
 using Blaxpro.Sql.Extensions.Queries;
 using Blaxpro.Sql.Extensions.DbTransactions;
+using Blaxpro.Sql.Exceptions;
+using System.Diagnostics;
+using System;
 
 namespace Blaxpro.Sql.Tests
 {
     public static class TransactionTestExtensions
     {
-        public static int dropProductsTable(this ITransaction transaction)
+        public static IDb dropProductsTable(this IDb db)
         {
-            return transaction.set(@"DROP TABLE products;");
+            prv_migrate(db, prv_dropProductsTable);
+            return db;
         }
 
-        public static int createProductsTable(this ITransaction transaction)
+        public static IDb createProductsTable(this IDb db)
         {
-            Query query;
-
-            query = @"
-CREATE TABLE products
-(
-    id BIGINT NOT NULL IDENTITY(1,1),
-    name nvarchar(256) NOT NULL,
-    price decimal(10,2) NOT NULL,
-    PRIMARY KEY (id)
-);";
-
-            return transaction.set(query);
+            prv_migrate(db, prv_createProductsTable);
+            return db;
         }
 
         public static IEnumerable<Product> getProductsByPriceRange(this ITransaction transaction
@@ -79,11 +73,48 @@ WHERE id = @id";
             return transaction.set("DELETE FROM products");
         }
 
+        private static void prv_migrate(IDb db, Func<ITransaction, int> transactionDelegate)
+        {
+            using (ITransaction transaction = db.transact())
+            {
+                try
+                {
+                    transactionDelegate(transaction);
+                }
+                catch (DbCommandExecutionException ex)
+                {
+                    Debug.Print(ex.Message);
+                }
+                transaction.saveChanges();
+            }
+        }
+
+        private static int prv_createProductsTable(ITransaction transaction)
+        {
+            Query query;
+
+            query = @"
+CREATE TABLE products
+(
+    id BIGINT NOT NULL IDENTITY(1,1),
+    name nvarchar(256) NOT NULL,
+    price decimal(10,2) NOT NULL,
+    PRIMARY KEY (id)
+);";
+
+            return transaction.set(query);
+        }
+
+        private static int prv_dropProductsTable(ITransaction transaction)
+        {
+            return transaction.set(@"DROP TABLE products;");
+        }
+
         private static Product prv_buildProduct(IDataRecord r)
         {
             return new Product
             {
-                Id = (int)r["id"],
+                Id = (long)r["id"],
                 Name = (string)r["name"],
                 Price = (decimal)r["price"],
             };
