@@ -6,10 +6,6 @@ namespace Blaxpro.Sql.Exceptions
     [Serializable]
     public class DbTransactionException : Exception
     {
-        public DbTransactionException()
-        {
-        }
-
         public DbTransactionException(string message) : base(message)
         {
         }
