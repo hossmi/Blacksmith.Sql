@@ -11,8 +11,7 @@ using Xunit;
 
 namespace Blaxpro.Sql.Tests
 {
-
-    public class UnitTest1
+    public class DbTests
     {
         private readonly static Product[] initialProducts = new[]
         {
@@ -22,27 +21,12 @@ namespace Blaxpro.Sql.Tests
             new Product { Name = "wine",  Price = 13.21m},
         };
 
-        private static IDbConnection prv_getSqlServerConnection()
-        {
-            return new SqlConnection(@"Data Source=(localdb)\v11.0;Initial Catalog=blaxpro-sql-tests;Integrated Security=True;Pooling=False");
-        }
-
-        private static IDbConnection prv_getSqliteConnection()
-        {
-            string databaseFileFullPath;
-
-            databaseFileFullPath = Path.Combine(Environment.CurrentDirectory, "test.sqlite");
-            Assert.True(File.Exists(databaseFileFullPath));
-
-            return new SQLiteConnection($@"Data Source={databaseFileFullPath}; Version=3;");
-        }
-
         [Fact]
         public void sqlServer_tests()
         {
             IDb db;
 
-            db = new Db(prv_getSqlServerConnection);
+            db = new Db(Connections.getSqlServerConnection);
             db.dropProductsTable();
             db.createProductsTable();
 
@@ -85,7 +69,7 @@ namespace Blaxpro.Sql.Tests
         {
             IDb db;
 
-            db = new Db(prv_getSqliteConnection);
+            db = new Db(Connections.getSqliteConnection);
             db.dropProductsTable();
             db.createSqliteProductsTable();
 
