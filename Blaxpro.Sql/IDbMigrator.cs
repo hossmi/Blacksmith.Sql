@@ -1,8 +1,11 @@
-﻿namespace Blaxpro.Sql
+﻿using System.Collections.Generic;
+
+namespace Blaxpro.Sql
 {
     public interface IDbMigrator
     {
-        void add<TMigration>() where TMigration : class, IMigration, new();
+        void add(IMigration migration);
         IMigrationResult upgrade(IDb db);
+        IEnumerable<IMigrationScript> getScripts(int fromVersion, int toVersion);
     }
 }

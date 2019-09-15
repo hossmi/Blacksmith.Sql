@@ -16,8 +16,8 @@ namespace Blaxpro.Sql.Tests
 
             db = new Db(Connections.getSqlServerConnection);
             dbMigrator = new DbMigrator();
-            dbMigrator.add<V1StartMigration>();
-            dbMigrator.add<V2AddUserBirthDateColumnMigration>();
+            dbMigrator.add(new V1CreateUsersTableMigration());
+            dbMigrator.add(new V2AddUserBirthDateColumnMigration());
 
             migrationResult = dbMigrator.upgrade(db);
             Assert.Equal(2, migrationResult.Count);
@@ -29,7 +29,7 @@ namespace Blaxpro.Sql.Tests
             Assert.Equal(2, migrationResult.PreviousVersion);
             Assert.Equal(2, migrationResult.CurrentVersion);
 
-            dbMigrator.add<V3WrongMigration>();
+            dbMigrator.add(new V3WrongMigration());
 
             Assert.Throws<DbMigrationException>(() =>
             {
@@ -48,6 +48,27 @@ namespace Blaxpro.Sql.Tests
             db = new Db(Connections.getSqliteConnection);
 
             throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void get_migration_scripts_tests()
+        {
+            IDbMigrator dbMigrator;
+            IList<IMigrationScript> migrationScripts;
+
+            dbMigrator = new DbMigrator();
+            dbMigrator.add(new V1CreateUsersTableMigration());
+            dbMigrator.add(new V2AddUserBirthDateColumnMigration());
+            dbMigrator.add(new V3WrongMigration());
+
+            migrationScripts = dbMigrator
+                .getScripts(fromVersion: 1, toVersion: 3)
+                .ToList();
+
+            Assert.Equal(3, migrationScripts.Count);
+            
+
+
         }
     }
 }

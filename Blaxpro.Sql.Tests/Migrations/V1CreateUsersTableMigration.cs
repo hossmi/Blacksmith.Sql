@@ -1,6 +1,6 @@
 ﻿namespace Blaxpro.Sql.Tests
 {
-    public class V2AddUserBirthDateColumnMigration : IMigration
+    public class V1CreateUsersTableMigration : IMigration
     {
         public int SourceVersion { get; }
         public int TargetVersion { get; }

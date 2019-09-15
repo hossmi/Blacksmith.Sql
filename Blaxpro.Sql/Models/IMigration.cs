@@ -4,7 +4,7 @@
     {
         int SourceVersion { get; }
         int TargetVersion { get; }
-        void upgrade(ITransaction transaction);
-        void downgrade(ITransaction transaction);
+        void upgrade(ICommandExecutor setter);
+        void downgrade(ICommandExecutor setter);
     }
 }
