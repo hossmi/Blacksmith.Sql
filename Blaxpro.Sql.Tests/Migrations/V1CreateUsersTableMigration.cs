@@ -1,18 +1,31 @@
-﻿namespace Blaxpro.Sql.Tests
-{
-    public class V1CreateUsersTableMigration : IMigration
-    {
-        public int SourceVersion { get; }
-        public int TargetVersion { get; }
+﻿using Blaxpro.Sql.Models;
+using System.Collections.Generic;
 
-        public void downgrade(ICommandExecutor setter)
+namespace Blaxpro.Sql.Tests
+{
+    public class V1CreateUsersTableMigration : AbstractMigration
+    {
+        public static string Create_users_table => "Create users table";
+
+        protected override string prv_getName()
         {
-            throw new System.NotImplementedException();
+            return Create_users_table;
         }
 
-        public void upgrade(ICommandExecutor setter)
+        protected override IEnumerable<IQuery> prv_getUpgrades()
         {
-            throw new System.NotImplementedException();
+            yield return (Query)@"
+CREATE TABLE users
+(
+    id BIGINT NOT NULL IDENTITY(1,1),
+    name nvarchar(256) NOT NULL,
+    PRIMARY KEY (id)
+);";
+        }
+
+        protected override IEnumerable<IQuery> prv_getDowngrades()
+        {
+            yield return (Query)@"DROP TABLE users;";
         }
     }
 }

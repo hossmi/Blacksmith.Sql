@@ -1,18 +1,26 @@
-﻿namespace Blaxpro.Sql.Tests
+﻿using Blaxpro.Sql.Models;
+using System.Collections.Generic;
+
+namespace Blaxpro.Sql.Tests
 {
     public class V2AddUserBirthDateColumnMigration : IMigration
     {
-        public int SourceVersion { get; }
-        public int TargetVersion { get; }
+        public static string AddUsersBirthdateColumn => "Add Users Birthdate Column";
+        public string Name => AddUsersBirthdateColumn;
 
-        public void downgrade(ICommandExecutor setter)
+        public IEnumerable<IMigration> getDependencies()
         {
-            throw new System.NotImplementedException();
+            yield return new V1CreateUsersTableMigration();
         }
 
-        public void upgrade(ICommandExecutor setter)
+        public IEnumerable<IQuery> getDowngrades()
         {
-            throw new System.NotImplementedException();
+            yield return (Query)"ALTER TABLE users DROM COLUMN birthdate;";
+        }
+
+        public IEnumerable<IQuery> getUpgrades()
+        {
+            yield return (Query)"ALTER TABLE users ADD COLUMN birthdate DATETIME NULL;";
         }
     }
 }

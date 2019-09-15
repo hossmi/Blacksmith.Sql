@@ -1,18 +1,27 @@
-﻿namespace Blaxpro.Sql.Tests
+﻿using Blaxpro.Sql.Extensions.DbTransactions;
+using Blaxpro.Sql.Models;
+using System.Collections.Generic;
+
+namespace Blaxpro.Sql.Tests
 {
     public class V3WrongMigration : IMigration
     {
-        public int SourceVersion { get; }
-        public int TargetVersion { get; }
+        public static string Boooooom => "Booooom";
+        public string Name => Boooooom;
 
-        public void downgrade(ICommandExecutor setter)
+        public IEnumerable<IMigration> getDependencies()
         {
-            throw new System.NotImplementedException();
+            yield return new V2AddUserBirthDateColumnMigration();
         }
 
-        public void upgrade(ICommandExecutor setter)
+        public IEnumerable<IQuery> getDowngrades()
         {
-            throw new System.NotImplementedException();
+            yield break;
+        }
+
+        public IEnumerable<IQuery> getUpgrades()
+        {
+            yield return (Query)"update BOOOOOOOOM;";
         }
     }
 }

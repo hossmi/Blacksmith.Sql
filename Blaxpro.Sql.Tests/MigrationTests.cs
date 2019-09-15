@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blaxpro.Sql.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -13,31 +14,29 @@ namespace Blaxpro.Sql.Tests
             IDb db;
             IDbMigrator dbMigrator;
             IMigrationResult migrationResult;
+            IMigrationStep currentStep;
 
             db = new Db(Connections.getSqlServerConnection);
             dbMigrator = new DbMigrator();
-            dbMigrator.add(new V1CreateUsersTableMigration());
-            dbMigrator.add(new V2AddUserBirthDateColumnMigration());
 
+            dbMigrator.add(new V2AddUserBirthDateColumnMigration());
             migrationResult = dbMigrator.upgrade(db);
+
             Assert.Equal(2, migrationResult.Count);
-            Assert.Equal(0, migrationResult.PreviousVersion);
-            Assert.Equal(2, migrationResult.CurrentVersion);
+            Assert.Null(migrationResult.Previous);
+            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, migrationResult.Current.Name);
 
             migrationResult = dbMigrator.upgrade(db);
             Assert.Equal(0, migrationResult.Count);
-            Assert.Equal(2, migrationResult.PreviousVersion);
-            Assert.Equal(2, migrationResult.CurrentVersion);
+            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, migrationResult.Previous.Name);
+            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, migrationResult.Current.Name);
 
             dbMigrator.add(new V3WrongMigration());
 
-            Assert.Throws<DbMigrationException>(() =>
-            {
-                migrationResult = dbMigrator.upgrade(db);
-            });
+            Assert.Throws<DbMigrationException>(() => dbMigrator.upgrade(db));
 
-            Assert.Equal(2, migrationResult.CurrentVersion);
-
+            currentStep = dbMigrator.getLast(db);
+            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, currentStep.Name);
         }
 
         [Fact]
@@ -54,18 +53,16 @@ namespace Blaxpro.Sql.Tests
         public void get_migration_scripts_tests()
         {
             IDbMigrator dbMigrator;
-            IList<IMigrationScript> migrationScripts;
+            IList<IQuery> migrationQueries;
 
             dbMigrator = new DbMigrator();
-            dbMigrator.add(new V1CreateUsersTableMigration());
-            dbMigrator.add(new V2AddUserBirthDateColumnMigration());
             dbMigrator.add(new V3WrongMigration());
 
-            migrationScripts = dbMigrator
-                .getScripts(fromVersion: 1, toVersion: 3)
+            migrationQueries = dbMigrator
+                .getQueries(V1CreateUsersTableMigration.Create_users_table, V3WrongMigration.Boooooom)
                 .ToList();
 
-            Assert.Equal(3, migrationScripts.Count);
+            Assert.Equal(2, migrationQueries.Count);
             
 
 

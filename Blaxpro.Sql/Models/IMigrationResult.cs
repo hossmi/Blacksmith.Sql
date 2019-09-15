@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Blaxpro.Sql
+namespace Blaxpro.Sql.Models
 {
-    public interface IMigrationResult : IReadOnlyList<IMigrationStepResult>
+    public interface IMigrationResult : IReadOnlyList<IMigrationStep>
     {
-        int PreviousVersion { get; }
-        int CurrentVersion { get; }
+        IMigrationStep Previous { get; }
+        IMigrationStep Current { get; }
     }
 }

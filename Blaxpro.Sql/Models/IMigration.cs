@@ -1,10 +1,12 @@
-﻿namespace Blaxpro.Sql
+﻿using System.Collections.Generic;
+
+namespace Blaxpro.Sql.Models
 {
     public interface IMigration
     {
-        int SourceVersion { get; }
-        int TargetVersion { get; }
-        void upgrade(ICommandExecutor setter);
-        void downgrade(ICommandExecutor setter);
+        string Name { get; }
+        IEnumerable<IMigration> getDependencies();
+        IEnumerable<IQuery> getUpgrades();
+        IEnumerable<IQuery> getDowngrades();
     }
 }
