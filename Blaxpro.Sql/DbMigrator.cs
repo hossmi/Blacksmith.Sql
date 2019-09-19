@@ -8,7 +8,6 @@ namespace Blaxpro.Sql
 {
     public class DbMigrator : IDbMigrator
     {
-        private readonly ISet<IMigration> migrations;
         private readonly Asserts assert;
 
 
@@ -23,7 +22,6 @@ namespace Blaxpro.Sql
 
         public DbMigrator() : this(DefaultSettings)
         {
-            this.migrations = new HashSet<IMigration>(new PrvMigrationEqualityComparer());
         }
 
         public MigrationSettings Settings { get; }
@@ -39,12 +37,7 @@ namespace Blaxpro.Sql
             }
         }
 
-        public void add(IMigration migration)
-        {
-            this.migrations.Add(migration);
-        }
-
-        public IMigrationStep getLast(IDb db)
+        public IMigrationStep getEnabledMigrations(IDb db)
         {
             using (ITransaction transaction = db.transact())
             {
@@ -66,16 +59,6 @@ ORDER BY [date] DESC;";
 
                 throw new NotImplementedException();
             }
-            throw new System.NotImplementedException();
-        }
-
-        public IEnumerable<IQuery> getQueries(string fromVersion, string toVersion)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public IMigrationResult upgrade(IDb db)
-        {
             throw new System.NotImplementedException();
         }
 
