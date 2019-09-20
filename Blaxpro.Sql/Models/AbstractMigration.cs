@@ -14,19 +14,6 @@ namespace Blaxpro.Sql.Models
             this.asserts = Asserts.Assert;
         }
 
-        public string Name
-        {
-            get
-            {
-                string name;
-
-                name = this.prv_getName();
-                this.asserts.stringIsNotEmpty(name, "Migration name cannot be null or empty.");
-
-                return name;
-            }
-        }
-
         public IEnumerable<IMigration> getDependencies()
         {
             IEnumerable<IMigration> migrations;
@@ -68,7 +55,5 @@ namespace Blaxpro.Sql.Models
         {
             yield break;
         }
-
-        protected abstract string prv_getName();
     }
 }

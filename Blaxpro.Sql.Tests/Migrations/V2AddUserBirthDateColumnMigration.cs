@@ -5,9 +5,6 @@ namespace Blaxpro.Sql.Tests
 {
     public class V2AddUserBirthDateColumnMigration : IMigration
     {
-        public static string AddUsersBirthdateColumn => "Add Users Birthdate Column";
-        public string Name => AddUsersBirthdateColumn;
-
         public IEnumerable<IMigration> getDependencies()
         {
             yield return new V1CreateUsersTableMigration();

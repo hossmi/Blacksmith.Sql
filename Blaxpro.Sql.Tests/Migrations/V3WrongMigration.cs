@@ -6,9 +6,6 @@ namespace Blaxpro.Sql.Tests
 {
     public class V3WrongMigration : IMigration
     {
-        public static string Boooooom => "Booooom";
-        public string Name => Boooooom;
-
         public IEnumerable<IMigration> getDependencies()
         {
             yield return new V2AddUserBirthDateColumnMigration();

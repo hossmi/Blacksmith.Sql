@@ -53,7 +53,7 @@ namespace Blaxpro.Sql.Tests
             dbMigrator = new DbMigrator();
 
             migrationQueries = dbMigrator
-                .getQueries(V1CreateUsersTableMigration.Create_users_table, V3WrongMigration.Boooooom)
+                .getQueries<V1CreateUsersTableMigration, V3WrongMigration>()
                 .ToList();
 
             Assert.Equal(2, migrationQueries.Count);
