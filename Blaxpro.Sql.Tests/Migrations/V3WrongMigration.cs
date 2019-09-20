@@ -4,19 +4,22 @@ using System.Collections.Generic;
 
 namespace Blaxpro.Sql.Tests
 {
-    public class V3WrongMigration : IMigration
+    public class V3WrongMigration : AbstractMigration
     {
-        public IEnumerable<IMigration> getDependencies()
+        public static string WrongMigration => "Booooooom";
+
+
+        protected override IEnumerable<IMigration> prv_getDependencies()
         {
             yield return new V2AddUserBirthDateColumnMigration();
         }
 
-        public IEnumerable<IQuery> getDowngrades()
+        protected override string prv_getName()
         {
-            yield break;
+            return WrongMigration;
         }
 
-        public IEnumerable<IQuery> getUpgrades()
+        protected override IEnumerable<IQuery> prv_getUpgrades()
         {
             yield return (Query)"update BOOOOOOOOM;";
         }

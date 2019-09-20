@@ -17,18 +17,22 @@ namespace Blaxpro.Sql.Tests
 
             db = new Db(Connections.getSqlServerConnection);
             dbMigrator = new DbMigrator();
+            dbMigrator.set(new V2AddUserBirthDateColumnMigration());
+            dbMigrator.set(new V1CreateUsersTableMigration());
 
-            migrationReport = dbMigrator.enable<V2AddUserBirthDateColumnMigration>(db);
+            migrationReport = dbMigrator.upgrade(db);
 
             Assert.Equal(2, migrationReport.Count);
+            Assert.Equal(V1CreateUsersTableMigration.Create_users_table, migrationReport[0].Name);
             Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, migrationReport[1].Name);
 
-            migrationReport = dbMigrator.enable<V2AddUserBirthDateColumnMigration>(db);
+            migrationReport = dbMigrator.upgrade(db);
             Assert.Equal(0, migrationReport.Count);
 
-            Assert.Throws<DbMigrationException>(() => dbMigrator.enable<V3WrongMigration>(db));
+            dbMigrator.set(new V3WrongMigration());
+            Assert.Throws<DbMigrationException>(() => dbMigrator.upgrade(db));
 
-            migrationReport = dbMigrator.getEnabledMigrations(db);
+            migrationReport = dbMigrator.getCurrentDbState(db);
             Assert.Equal(2, migrationReport.Count);
             Assert.Equal(V1CreateUsersTableMigration.Create_users_table, migrationReport[0].Name);
             Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, migrationReport[1].Name);
@@ -53,13 +57,10 @@ namespace Blaxpro.Sql.Tests
             dbMigrator = new DbMigrator();
 
             migrationQueries = dbMigrator
-                .getQueries<V1CreateUsersTableMigration, V3WrongMigration>()
+                .getQueries(V1CreateUsersTableMigration.Create_users_table, V3WrongMigration.WrongMigration)
                 .ToList();
 
             Assert.Equal(2, migrationQueries.Count);
-            
-
-
         }
     }
 }

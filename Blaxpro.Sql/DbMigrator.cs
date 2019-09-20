@@ -9,7 +9,8 @@ namespace Blaxpro.Sql
     public class DbMigrator : IDbMigrator
     {
         private readonly Asserts assert;
-
+        private readonly IDictionary<string, IMigration> migrations;
+        private readonly MigrationSettings settings;
 
         public DbMigrator(MigrationSettings settings)
         {
@@ -17,14 +18,14 @@ namespace Blaxpro.Sql
 
             this.assert.isNotNull(settings);
             this.assert.stringIsNotEmpty(settings.MigrationsTable);
-            this.Settings = settings;
+
+            this.settings = settings;
+            this.migrations = new Dictionary<string, IMigration>();
         }
 
         public DbMigrator() : this(DefaultSettings)
         {
         }
-
-        public MigrationSettings Settings { get; }
 
         public static MigrationSettings DefaultSettings
         {
@@ -37,30 +38,55 @@ namespace Blaxpro.Sql
             }
         }
 
-        public IMigrationStep getEnabledMigrations(IDb db)
+        public IMigrationReport getCurrentDbState(IDb db)
         {
-            using (ITransaction transaction = db.transact())
-            {
-                IMigrationStep migrationStep;
-                Query query;
-
-                query = $@"
-SELECT TOP 1 [name], [date]
-FROM [{this.Settings.MigrationsTable}]
-ORDER BY [date] DESC;";
-
-                migrationStep = transaction
-                    .get(query)
-                    .Select(r => (IMigrationStep)new PrvMigrationStep
-                    {
-                         Name = (string)r["name"],
-                          Date = (DateTime)r["date"],
-                    }).FirstOrDefault();
-
-                throw new NotImplementedException();
-            }
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
+
+        public IMigrationReport upgrade(IDb db)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IMigrationReport downgradeTo(string migrationName, IDb db)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IQuery> getQueries(string fromMigration, string toMigration)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void set(IMigration migration)
+        {
+            throw new NotImplementedException();
+        }
+
+        //        public IMigrationStep getEnabledMigrations(IDb db)
+        //        {
+        //            using (ITransaction transaction = db.transact())
+        //            {
+        //                IMigrationStep migrationStep;
+        //                Query query;
+
+        //                query = $@"
+        //SELECT TOP 1 [name], [date]
+        //FROM [{this.Settings.MigrationsTable}]
+        //ORDER BY [date] DESC;";
+
+        //                migrationStep = transaction
+        //                    .get(query)
+        //                    .Select(r => (IMigrationStep)new PrvMigrationStep
+        //                    {
+        //                         Name = (string)r["name"],
+        //                          Date = (DateTime)r["date"],
+        //                    }).FirstOrDefault();
+
+        //                throw new NotImplementedException();
+        //            }
+        //            throw new System.NotImplementedException();
+        //        }
 
         private class PrvMigrationEqualityComparer : IEqualityComparer<IMigration>
         {
@@ -79,6 +105,7 @@ ORDER BY [date] DESC;";
         {
             public string Name { get; set; }
             public DateTime Date { get; set; }
+            public bool Enabled { get; set; }
         }
     }
 }

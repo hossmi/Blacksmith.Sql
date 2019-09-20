@@ -14,6 +14,17 @@ namespace Blaxpro.Sql.Models
             this.asserts = Asserts.Assert;
         }
 
+        public string Name
+        {
+            get
+            {
+                string name = prv_getName();
+                this.asserts.stringIsNotEmpty(name, "Migration name cannot be empty.");
+
+                return name;
+            }
+        }
+
         public IEnumerable<IMigration> getDependencies()
         {
             IEnumerable<IMigration> migrations;
@@ -45,6 +56,8 @@ namespace Blaxpro.Sql.Models
         }
 
         protected abstract IEnumerable<IQuery> prv_getUpgrades();
+
+        protected abstract string prv_getName();
 
         protected virtual IEnumerable<IQuery> prv_getDowngrades()
         {

@@ -5,6 +5,8 @@ namespace Blaxpro.Sql.Tests
 {
     public class V1CreateUsersTableMigration : AbstractMigration
     {
+        public static string Create_users_table => "Create users table";
+
         protected override IEnumerable<IQuery> prv_getUpgrades()
         {
             yield return (Query)@"
@@ -19,6 +21,11 @@ CREATE TABLE users
         protected override IEnumerable<IQuery> prv_getDowngrades()
         {
             yield return (Query)@"DROP TABLE users;";
+        }
+
+        protected override string prv_getName()
+        {
+            return Create_users_table;
         }
     }
 }

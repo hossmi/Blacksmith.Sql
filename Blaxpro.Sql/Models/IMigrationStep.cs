@@ -6,5 +6,6 @@ namespace Blaxpro.Sql.Models
     {
         string Name { get; }
         DateTime Date { get; }
+        bool Enabled { get; }
     }
 }
