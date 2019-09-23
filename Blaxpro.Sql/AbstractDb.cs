@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Blaxpro.Sql.Models;
+using System.Data;
 
 namespace Blaxpro.Sql
 {

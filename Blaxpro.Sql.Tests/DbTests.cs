@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Blaxpro.Sql.Exceptions;
+using Blaxpro.Sql.Models;
 using Xunit;
 
 namespace Blaxpro.Sql.Tests

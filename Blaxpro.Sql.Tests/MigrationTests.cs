@@ -1,4 +1,5 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blaxpro.Sql.Exceptions;
+using Blaxpro.Sql.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,54 +14,44 @@ namespace Blaxpro.Sql.Tests
         {
             IDb db;
             IDbMigrator dbMigrator;
-            IMigrationReport migrationReport;
+            IMigrableDb migrableDb;
+            IMigrationStep[] steps;
+            IList<IMigrationStep> migrationHistory;
 
             db = new Db(Connections.getSqlServerConnection);
-            dbMigrator = new DbMigrator();
+            dbMigrator = new SqlDbMigrator();
             dbMigrator.add(new V2AddUserBirthDateColumnMigration());
             dbMigrator.add(new V1CreateUsersTableMigration());
 
-            migrationReport = dbMigrator.upgrade(db);
+            migrableDb = dbMigrator.getFor(db);
 
-            Assert.Equal(2, migrationReport.Count);
-            Assert.Equal(V1CreateUsersTableMigration.Create_users_table, migrationReport[0].Name);
-            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, migrationReport[1].Name);
+            Assert.False(migrableDb.IsInitialized);
+            Assert.Throws<UninitializedMigrationsException>(() => migrableDb.History);
+            Assert.Throws<UninitializedMigrationsException>(migrableDb.upgrade);
 
-            migrationReport = dbMigrator.upgrade(db);
-            Assert.Equal(0, migrationReport.Count);
+            migrableDb.initialize();
+
+            Assert.True(migrableDb.IsInitialized);
+
+            steps = migrableDb.upgrade();
+            Assert.Equal(2, steps.Length);
+            Assert.Equal(V1CreateUsersTableMigration.Create_users_table, steps[0].Name);
+            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, steps[1].Name);
+
+            steps = migrableDb.upgrade();
+            Assert.Empty(steps);
 
             dbMigrator.add(new V3WrongMigration());
-            Assert.Throws<DbMigrationException>(() => dbMigrator.upgrade(db));
+            migrableDb = dbMigrator.getFor(db);
+            Assert.Throws<DbMigrationException>(migrableDb.upgrade);
 
-            migrationReport = dbMigrator.getCurrentState(db);
-            Assert.Equal(2, migrationReport.Count);
-            Assert.Equal(V1CreateUsersTableMigration.Create_users_table, migrationReport[0].Name);
-            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, migrationReport[1].Name);
+            migrationHistory = migrableDb.History.ToList();
+            Assert.Equal(3, steps.Length);
+            Assert.Equal(SqlDbMigrator.DefaultSettings.InitialMigrationName, steps[0].Name);
+            Assert.Equal(V1CreateUsersTableMigration.Create_users_table, steps[1].Name);
+            Assert.Equal(V2AddUserBirthDateColumnMigration.AddUsersBirthdateColumn, steps[2].Name);
         }
 
-        [Fact]
-        public void sqlite_tests()
-        {
-            IDb db;
 
-            db = new Db(Connections.getSqliteConnection);
-
-            throw new NotImplementedException();
-        }
-
-        [Fact]
-        public void get_migration_scripts_tests()
-        {
-            IDbMigrator dbMigrator;
-            IList<IQuery> migrationQueries;
-
-            dbMigrator = new DbMigrator();
-
-            migrationQueries = dbMigrator
-                .getQueries(V1CreateUsersTableMigration.Create_users_table, V3WrongMigration.WrongMigration)
-                .ToList();
-
-            Assert.Equal(2, migrationQueries.Count);
-        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Blaxpro.Sql
+namespace Blaxpro.Sql.Exceptions
 {
     public class DbMigrationException : Exception
     {

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace Blaxpro.Sql
+namespace Blaxpro.Sql.Models
 {
     public interface ITransaction : IDisposable
     {

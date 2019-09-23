@@ -5,7 +5,7 @@ using Blaxpro.Sql.Exceptions;
 using Blaxpro.Sql.Extensions.DbCommands;
 using Blaxpro.Sql.Models;
 
-namespace Blaxpro.Sql
+namespace Blaxpro.Sql.Models
 {
     internal class Transaction : ITransaction
     {
