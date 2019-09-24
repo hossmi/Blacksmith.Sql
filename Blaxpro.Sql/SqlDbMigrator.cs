@@ -55,5 +55,10 @@ GO";
         {
             throw new System.NotImplementedException();
         }
+
+        protected override void prv_insertMigration(ITransaction transaction, string name)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
