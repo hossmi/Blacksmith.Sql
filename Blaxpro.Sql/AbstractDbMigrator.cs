@@ -21,6 +21,8 @@ namespace Blaxpro.Sql
             this.migrations = new Dictionary<string, IMigration>();
         }
 
+        public IDictionary<string, IMigration> Migrations => prv_getAllMigrations(this.migrations.Values);
+
         public void add(IMigration migration)
         {
             this.assert.isNotNull(migration);
@@ -32,6 +34,26 @@ namespace Blaxpro.Sql
         public IMigrableDb getFor(IDb db)
         {
             return new PrvMigrableDb(this, db);
+        }
+
+        protected abstract void prv_createMigrationsTable(ITransaction transaction);
+        protected abstract IEnumerable<IMigrationStep> prv_getMigrationHistory(ITransaction transaction);
+        protected abstract bool prv_existsMigrationsTable(ITransaction transaction);
+
+        private void prv_assertIsInitialized(ITransaction transaction)
+        {
+            bool migrationsTableExists;
+
+            migrationsTableExists = this.prv_existsMigrationsTable(transaction);
+
+            if (migrationsTableExists == false)
+                throw new MigrationsSetupException($"Database migrations system has not been initialized.");
+        }
+
+        private static IDictionary<string, IMigration> prv_getAllMigrations(IEnumerable<IMigration> migrations)
+        {
+
+            throw new NotImplementedException();
         }
 
         private class PrvMigrableDb : IMigrableDb
@@ -49,11 +71,21 @@ namespace Blaxpro.Sql
             {
                 get
                 {
-                    if (this.IsInitialized == false)
-                        throw new UninitializedMigrationsException($"Database migrations system has not been initialized. Call '{nameof(this.initialize)}' method first.");
-
                     using (ITransaction transaction = this.Db.transact())
-                        return this.migrator.prv_getMigrationHistory(transaction);
+                    {
+                        IDictionary<string, IMigration> migrations;
+
+                        this.migrator.prv_assertIsInitialized(transaction);
+                        migrations = prv_getAllMigrations(this.migrator.migrations.Values);
+
+                        foreach (IMigrationStep step in this.migrator.prv_getMigrationHistory(transaction))
+                        {
+                            if (migrations.ContainsKey(step.Name))
+                                yield return step;
+                            else
+                                throw new MigrationsSetupException($@"Missing migration instance for '{step.Name}'.");
+                        }
+                    }
                 }
             }
 
@@ -73,26 +105,28 @@ namespace Blaxpro.Sql
 
             public void initialize()
             {
-                if (this.IsInitialized)
-                    throw new AlreadyInitializedMigrationsException($"Database migrations system has already been initialized.");
-
                 using (ITransaction transaction = this.Db.transact())
                 {
                     IMigrationStep[] history;
                     bool migrationsTableExists;
 
+                    migrationsTableExists = this.migrator.prv_existsMigrationsTable(transaction);
+
+                    if (migrationsTableExists)
+                        throw new MigrationsSetupException($"Database migrations system has already been initialized.");
+
                     this.migrator.prv_createMigrationsTable(transaction);
                     migrationsTableExists = this.migrator.prv_existsMigrationsTable(transaction);
 
-                    if(migrationsTableExists == false)
-                        throw new DbMigrationException($"Migrations table could not been created.");
+                    if (migrationsTableExists == false)
+                        throw new MigrationsSetupException($"Migrations table could not been created.");
 
                     history = this.migrator
                         .prv_getMigrationHistory(transaction)
                         .ToArray();
 
                     if (history.Length != 0)
-                        throw new DbMigrationException($"Just created migrations table cannot have registers.");
+                        throw new MigrationsSetupException($"New migrations table is not empty!");
 
                     transaction.saveChanges();
                 }
@@ -100,38 +134,18 @@ namespace Blaxpro.Sql
 
             public IMigrationStep[] upgrade()
             {
+                using (ITransaction transaction = this.Db.transact())
+                {
+                    IDictionary<string, IMigration> migrations;
+
+                    this.migrator.prv_assertIsInitialized(transaction);
+                    migrations = prv_getAllMigrations(this.migrator.migrations.Values);
+
+
+                }
                 throw new NotImplementedException();
             }
+
         }
-
-        protected abstract void prv_createMigrationsTable(ITransaction transaction);
-        protected abstract IEnumerable<IMigrationStep> prv_getMigrationHistory(ITransaction transaction);
-        protected abstract bool prv_existsMigrationsTable(ITransaction transaction);
-
-        //        public IMigrationStep getEnabledMigrations(IDb db)
-        //        {
-        //            using (ITransaction transaction = db.transact())
-        //            {
-        //                IMigrationStep migrationStep;
-        //                Query query;
-
-        //                query = $@"
-        //SELECT TOP 1 [name], [date]
-        //FROM [{this.Settings.MigrationsTable}]
-        //ORDER BY [date] DESC;";
-
-        //                migrationStep = transaction
-        //                    .get(query)
-        //                    .Select(r => (IMigrationStep)new PrvMigrationStep
-        //                    {
-        //                         Name = (string)r["name"],
-        //                          Date = (DateTime)r["date"],
-        //                    }).FirstOrDefault();
-
-        //                throw new NotImplementedException();
-        //            }
-        //            throw new System.NotImplementedException();
-        //        }
-
     }
 }

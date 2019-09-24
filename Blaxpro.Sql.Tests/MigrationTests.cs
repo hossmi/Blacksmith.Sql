@@ -26,8 +26,8 @@ namespace Blaxpro.Sql.Tests
             migrableDb = dbMigrator.getFor(db);
 
             Assert.False(migrableDb.IsInitialized);
-            Assert.Throws<UninitializedMigrationsException>(() => migrableDb.History);
-            Assert.Throws<UninitializedMigrationsException>(migrableDb.upgrade);
+            Assert.Throws<MigrationsSetupException>(() => migrableDb.History);
+            Assert.Throws<MigrationsSetupException>(migrableDb.upgrade);
 
             migrableDb.initialize();
 

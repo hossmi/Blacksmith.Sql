@@ -125,6 +125,7 @@ namespace Blaxpro.Sql.Models
 
                 while (reader.Read())
                     yield return reader;
+
                 reader.Close();
             }
         }
