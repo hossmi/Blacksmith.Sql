@@ -56,13 +56,13 @@ namespace Blaxpro.Sql
             , IEnumerator<IMigration> iterator
             , ref IDictionary<string, IMigrationStep> migrationHistory)
         {
-            if (iterator.MoveNext() == false)
-                return Enumerable.Empty<IMigrationStep>();
-
             IMigration currentMigration;
             IEnumerator<IMigration> dependantMigrationsIterator;
             IEnumerable<IMigrationStep> executedSteps;
             MigrationStep currentStep;
+
+            if (iterator.MoveNext() == false)
+                return Enumerable.Empty<IMigrationStep>();
 
             currentMigration = iterator.Current;
 
