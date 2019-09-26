@@ -63,22 +63,13 @@ namespace Blaxpro.Sql.Tests
 
             migrations = new IMigration[]
             {
-                new FakeMigration
-                {
-                    Name = "V2",
-                    Dependencies = new IMigration[]
-                    {
-                        new FakeMigration
-                        {
-                            Name = "V1",
-                        },
-                    },
-                },
-                new FakeMigration
-                {
-                    Name = "V1",
-                },
+                new FakeMigration { Name = "V1" },
+                new FakeMigration { Name = "V2" },
+                new FakeMigration { Name = "V3" },
             };
+
+            migrations[1].Dependencies = new[] { migrations[0] };
+            migrations[2].Dependencies = new[] { migrations[1] };
 
             db = new FakeDb();
             dbMigrator = new FakeDbMigrator();
