@@ -25,7 +25,6 @@ namespace Blaxpro.Sql
                 return new MigrationSettings
                 {
                     MigrationsTable = "__migrations",
-                    InitialMigrationName = "Data base migrations initialization.",
                     Schema = "dbo",
                 };
             }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Blaxpro.Sql.Models;
 using Xunit;
@@ -8,6 +9,8 @@ namespace Blaxpro.Sql.Tests
     public class FakeTransaction : ITransaction
     {
         private bool disposed;
+
+        public event Func<IQuery, int> InvokedSet;
 
         public FakeTransaction()
         {
@@ -36,7 +39,7 @@ namespace Blaxpro.Sql.Tests
 
         public int set(IQuery query)
         {
-            throw new System.NotImplementedException();
+            return this.InvokedSet?.Invoke(query) ?? 0;
         }
     }
 }

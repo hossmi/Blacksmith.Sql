@@ -5,6 +5,6 @@ namespace Blaxpro.Sql.Models
     public interface IMigrationStep
     {
         string Name { get; }
-        DateTime? Date { get; }
+        DateTime Date { get; }
     }
 }

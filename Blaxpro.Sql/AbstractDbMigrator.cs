@@ -53,49 +53,64 @@ namespace Blaxpro.Sql
 
         private IEnumerable<IMigrationStep> prv_upgrade(
             ITransaction transaction
-            , IEnumerator<IMigration> iterator
+            , IEnumerable<IMigration> migrations
             , ref IDictionary<string, IMigrationStep> migrationHistory)
         {
-            IMigration currentMigration;
-            IEnumerator<IMigration> dependantMigrationsIterator;
             IEnumerable<IMigrationStep> executedSteps;
-            MigrationStep currentStep;
 
-            if (iterator.MoveNext() == false)
-                return Enumerable.Empty<IMigrationStep>();
+            executedSteps = Enumerable.Empty<IMigrationStep>();
 
-            currentMigration = iterator.Current;
-
-            if (migrationHistory.ContainsKey(currentMigration.Name))
-                return prv_upgrade(transaction, iterator, ref migrationHistory);
-
-            dependantMigrationsIterator = currentMigration
-                .getDependencies()
-                .GetEnumerator();
-
-            executedSteps = prv_upgrade(transaction, dependantMigrationsIterator, ref migrationHistory);
-
-            foreach (IQuery query in currentMigration.getUpgrades())
-                transaction.set(query);
-
-            this.prv_insertMigration(transaction, currentMigration.Name);
-
-            currentStep = new MigrationStep
+            foreach (IMigration migration in migrations)
             {
-                Name = currentMigration.Name,
-                Date = DateTime.UtcNow,
-            };
+                IEnumerable<IMigrationStep> currentMigrationExecutedSteps;
+                MigrationStep currentStep;
 
-            migrationHistory.Add(currentStep.Name, currentStep);
+                if (migrationHistory.ContainsKey(migration.Name))
+                    continue;
+                
+                currentMigrationExecutedSteps = prv_upgrade(transaction, migration.getDependencies(), ref migrationHistory);
 
-            return executedSteps
-                .Concat(new[] { currentStep });
+                foreach (IQuery query in migration.getUpgrades())
+                    transaction.set(query);
+
+                this.prv_insertMigration(transaction, migration.Name);
+
+                currentStep = new MigrationStep
+                {
+                    Name = migration.Name,
+                    Date = DateTime.UtcNow,
+                };
+
+                migrationHistory.Add(currentStep.Name, currentStep);
+
+                executedSteps = executedSteps
+                    .Concat(currentMigrationExecutedSteps)
+                    .Concat(new[] { currentStep });
+            }
+
+            return executedSteps;
         }
 
         private static IDictionary<string, IMigration> prv_getAllMigrations(IEnumerable<IMigration> migrations)
         {
+            IDictionary<string, IMigration> allMigrations;
 
-            throw new NotImplementedException();
+            allMigrations = new Dictionary<string, IMigration>();
+            prv_getAllMigrations(migrations, ref allMigrations);
+
+            return allMigrations;
+        }
+
+        private static void prv_getAllMigrations(IEnumerable<IMigration> migrations, ref IDictionary<string, IMigration> allMigrations)
+        {
+            foreach (IMigration migration in migrations)
+            {
+                if (false == allMigrations.ContainsKey(migration.Name))
+                {
+                    prv_getAllMigrations(migration.getDependencies(), ref allMigrations);
+                    allMigrations.Add(migration.Name, migration);
+                }
+            }
         }
 
         private static IMigrationStep prv_assertStepHasMatchingMigration(IMigrationStep step, IDictionary<string, IMigration> migrations)
@@ -186,7 +201,6 @@ namespace Blaxpro.Sql
                 using (ITransaction transaction = this.Db.transact())
                 {
                     IDictionary<string, IMigrationStep> migrationHistory;
-                    IEnumerator<IMigration> migrationIterator;
 
                     this.migrator.prv_assertIsInitialized(transaction);
 
@@ -195,12 +209,8 @@ namespace Blaxpro.Sql
                             .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
                             .ToDictionary(step => step.Name);
 
-                    migrationIterator = this.migrator
-                        .migrations
-                        .Values
-                        .GetEnumerator();
-
-                    executedSteps = this.migrator.prv_upgrade(transaction, migrationIterator, ref migrationHistory)
+                    executedSteps = this.migrator
+                        .prv_upgrade(transaction, this.migrator.migrations.Values, ref migrationHistory)
                         .ToArray();
 
                     transaction.saveChanges();
