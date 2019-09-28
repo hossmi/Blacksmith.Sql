@@ -198,22 +198,29 @@ namespace Blaxpro.Sql
                 executedSteps = new IMigrationStep[0];
                 migrations = prv_getAllMigrations(this.migrator.migrations.Values);
 
-                using (ITransaction transaction = this.Db.transact())
+                try
                 {
-                    IDictionary<string, IMigrationStep> migrationHistory;
+                    using (ITransaction transaction = this.Db.transact())
+                    {
+                        IDictionary<string, IMigrationStep> migrationHistory;
 
-                    this.migrator.prv_assertIsInitialized(transaction);
+                        this.migrator.prv_assertIsInitialized(transaction);
 
-                    migrationHistory = this.migrator
-                            .prv_getMigrationHistory(transaction)
-                            .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
-                            .ToDictionary(step => step.Name);
+                        migrationHistory = this.migrator
+                                .prv_getMigrationHistory(transaction)
+                                .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
+                                .ToDictionary(step => step.Name);
 
-                    executedSteps = this.migrator
-                        .prv_upgrade(transaction, this.migrator.migrations.Values, ref migrationHistory)
-                        .ToArray();
+                        executedSteps = this.migrator
+                            .prv_upgrade(transaction, this.migrator.migrations.Values, ref migrationHistory)
+                            .ToArray();
 
-                    transaction.saveChanges();
+                        transaction.saveChanges();
+                    }
+                }
+                catch (DbCommandExecutionException ex)
+                {
+                    throw new DbMigrationException("Error upgrading database", ex);
                 }
 
                 return executedSteps;

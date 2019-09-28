@@ -82,9 +82,9 @@ namespace Blaxpro.Sql.Tests
             Assert.Throws<DbMigrationException>(migrableDb.upgrade);
 
             migrationHistory = migrableDb.History.ToList();
-            Assert.Equal(2, steps.Length);
-            Assert.Equal("V1", steps[0].Name);
-            Assert.Equal("V2", steps[1].Name);
+            Assert.Equal(2, migrationHistory.Count);
+            Assert.Equal("V1", migrationHistory[0].Name);
+            Assert.Equal("V2", migrationHistory[1].Name);
         }
 
         private class PrvDbMigrator : AbstractDbMigrator
