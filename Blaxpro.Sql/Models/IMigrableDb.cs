@@ -9,7 +9,7 @@ namespace Blaxpro.Sql.Models
         bool IsInitialized { get; }
 
         IMigrationStep[] upgrade();
-        IMigrationStep[] downgradeTo(string migrationName);
+        IMigrationStep[] downgrade(string migrationName);
         void initialize();
     }
 }

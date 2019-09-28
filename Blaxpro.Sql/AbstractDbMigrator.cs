@@ -67,7 +67,7 @@ namespace Blaxpro.Sql
 
                 if (migrationHistory.ContainsKey(migration.Name))
                     continue;
-                
+
                 currentMigrationExecutedSteps = prv_upgrade(transaction, migration.getDependencies(), ref migrationHistory);
 
                 foreach (IQuery query in migration.getUpgrades())
@@ -79,6 +79,7 @@ namespace Blaxpro.Sql
                 {
                     Name = migration.Name,
                     Date = DateTime.UtcNow,
+                    Direction = MigrationDirection.Up,
                 };
 
                 migrationHistory.Add(currentStep.Name, currentStep);
@@ -226,7 +227,7 @@ namespace Blaxpro.Sql
                 return executedSteps;
             }
 
-            public IMigrationStep[] downgradeTo(string migrationName)
+            public IMigrationStep[] downgrade(string migrationName)
             {
                 throw new NotImplementedException();
             }

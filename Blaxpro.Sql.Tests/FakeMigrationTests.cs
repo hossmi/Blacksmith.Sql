@@ -35,19 +35,6 @@ namespace Blaxpro.Sql.Tests
             this.db.BeginTransaction += prv_db_BeginTransaction;
         }
 
-        private void prv_db_BeginTransaction(FakeTransaction transaction)
-        {
-            transaction.InvokedSet += prv_transaction_InvokedSet;
-        }
-
-        private int prv_transaction_InvokedSet(IQuery query)
-        {
-            if (query.Statement == "BOOM")
-                throw new DbCommandExecutionException(new Exception("Boooom"));
-
-            return random.Next(1, 34);
-        }
-
         [Fact]
         public void fake_migration_tests()
         {
@@ -72,7 +59,9 @@ namespace Blaxpro.Sql.Tests
             steps = migrableDb.upgrade();
             Assert.Equal(2, steps.Length);
             Assert.Equal("V1", steps[0].Name);
+            Assert.Equal(MigrationDirection.Up, steps[0].Direction);
             Assert.Equal("V2", steps[1].Name);
+            Assert.Equal(MigrationDirection.Up, steps[1].Direction);
 
             steps = migrableDb.upgrade();
             Assert.Empty(steps);
@@ -84,7 +73,43 @@ namespace Blaxpro.Sql.Tests
             migrationHistory = migrableDb.History.ToList();
             Assert.Equal(2, migrationHistory.Count);
             Assert.Equal("V1", migrationHistory[0].Name);
+            Assert.Equal(MigrationDirection.Up, steps[0].Direction);
             Assert.Equal("V2", migrationHistory[1].Name);
+            Assert.Equal(MigrationDirection.Up, steps[1].Direction);
+
+            steps = migrableDb.downgrade("V1");
+
+            Assert.Equal(2, steps.Length);
+            Assert.Equal("V2", steps[0].Name);
+            Assert.Equal(MigrationDirection.Down, steps[0].Direction);
+            Assert.Equal("V1", steps[1].Name);
+            Assert.Equal(MigrationDirection.Down, steps[1].Direction);
+
+            migrationHistory = migrableDb.History.ToList();
+            Assert.Equal(4, migrationHistory.Count);
+
+            Assert.Equal("V1", migrationHistory[0].Name);
+            Assert.Equal(MigrationDirection.Up, migrationHistory[0].Direction);
+            Assert.Equal("V2", migrationHistory[1].Name);
+            Assert.Equal(MigrationDirection.Up, migrationHistory[1].Direction);
+
+            Assert.Equal("V2", migrationHistory[0].Name);
+            Assert.Equal(MigrationDirection.Down, migrationHistory[0].Direction);
+            Assert.Equal("V1", migrationHistory[1].Name);
+            Assert.Equal(MigrationDirection.Down, migrationHistory[1].Direction);
+        }
+
+        private static void prv_db_BeginTransaction(FakeTransaction transaction)
+        {
+            transaction.InvokedSet += prv_transaction_InvokedSet;
+        }
+
+        private static int prv_transaction_InvokedSet(IQuery query)
+        {
+            if (query.Statement == "BOOM")
+                throw new DbCommandExecutionException(new Exception("Boooom"));
+
+            return random.Next(1, 34);
         }
 
         private class PrvDbMigrator : AbstractDbMigrator
@@ -114,7 +139,7 @@ namespace Blaxpro.Sql.Tests
 
             protected override void prv_insertMigration(ITransaction transaction, string name)
             {
-                this.fakeMigrationHistory.Add(new PrvMigrationStep(name));
+                this.fakeMigrationHistory.Add(new PrvMigrationStep(name) { Direction = MigrationDirection.Up });
             }
         }
 
@@ -128,6 +153,7 @@ namespace Blaxpro.Sql.Tests
 
             public string Name { get; set; }
             public DateTime Date { get; set; }
+            public MigrationDirection Direction { get; set; }
         }
     }
 }

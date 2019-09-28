@@ -6,5 +6,6 @@ namespace Blaxpro.Sql.Models
     {
         public string Name { get; set; }
         public DateTime Date { get; set; }
+        public MigrationDirection Direction { get; set; }
     }
 }
