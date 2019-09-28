@@ -191,12 +191,11 @@ namespace Blaxpro.Sql
                 }
             }
 
-            public IMigrationStep[] upgrade()
+            public IReadOnlyList<IMigrationStep> upgrade()
             {
-                IMigrationStep[] executedSteps;
+                IReadOnlyList<IMigrationStep> executedSteps;
                 IDictionary<string, IMigration> migrations;
 
-                executedSteps = new IMigrationStep[0];
                 migrations = prv_getAllMigrations(this.migrator.migrations.Values);
 
                 try
@@ -214,7 +213,8 @@ namespace Blaxpro.Sql
 
                         executedSteps = this.migrator
                             .prv_upgrade(transaction, this.migrator.migrations.Values, ref migrationHistory)
-                            .ToArray();
+                            .ToList()
+                            .AsReadOnly();
 
                         transaction.saveChanges();
                     }
@@ -227,8 +227,35 @@ namespace Blaxpro.Sql
                 return executedSteps;
             }
 
-            public IMigrationStep[] downgrade(string migrationName)
+            public IReadOnlyList<IMigrationStep> remove(string migrationName)
             {
+                IReadOnlyList<IMigrationStep> executedSteps;
+                IDictionary<string, IMigration> migrations;
+
+                if (false == this.migrator.migrations.ContainsKey(migrationName))
+                    throw new MigrationsSetupException($"Migration '{migrationName}' not found.");
+
+                migrations = prv_getChildMigrations(migrationName, this.migrator.migrations.Values);
+
+                using (ITransaction transaction = this.Db.transact())
+                {
+                    IDictionary<string, IMigrationStep> migrationHistory;
+
+                    this.migrator.prv_assertIsInitialized(transaction);
+
+                    migrationHistory = this.migrator
+                            .prv_getMigrationHistory(transaction)
+                            .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
+                            .ToDictionary(step => step.Name);
+
+                    executedSteps = this.migrator
+                        .prv_remove(transaction, this.migrator.migrations.Values, ref migrationHistory)
+                        .ToList()
+                        .AsReadOnly();
+
+                    transaction.saveChanges();
+
+                }
                 throw new NotImplementedException();
             }
 

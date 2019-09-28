@@ -8,8 +8,8 @@ namespace Blaxpro.Sql.Models
         IEnumerable<IMigrationStep> History { get; }
         bool IsInitialized { get; }
 
-        IMigrationStep[] upgrade();
-        IMigrationStep[] downgrade(string migrationName);
+        IReadOnlyList<IMigrationStep> upgrade();
+        IReadOnlyList<IMigrationStep> remove(string migrationName);
         void initialize();
     }
 }

@@ -40,7 +40,7 @@ namespace Blaxpro.Sql.Tests
         {
             IDbMigrator dbMigrator;
             IMigrableDb migrableDb;
-            IMigrationStep[] steps;
+            IReadOnlyList<IMigrationStep> steps;
             IList<IMigrationStep> migrationHistory;
 
             dbMigrator = new PrvDbMigrator();
@@ -57,7 +57,7 @@ namespace Blaxpro.Sql.Tests
             Assert.True(migrableDb.IsInitialized);
 
             steps = migrableDb.upgrade();
-            Assert.Equal(2, steps.Length);
+            Assert.Equal(2, steps.Count);
             Assert.Equal("V1", steps[0].Name);
             Assert.Equal(MigrationDirection.Up, steps[0].Direction);
             Assert.Equal("V2", steps[1].Name);
@@ -77,9 +77,9 @@ namespace Blaxpro.Sql.Tests
             Assert.Equal("V2", migrationHistory[1].Name);
             Assert.Equal(MigrationDirection.Up, steps[1].Direction);
 
-            steps = migrableDb.downgrade("V1");
+            steps = migrableDb.remove("V1");
 
-            Assert.Equal(2, steps.Length);
+            Assert.Equal(2, steps.Count);
             Assert.Equal("V2", steps[0].Name);
             Assert.Equal(MigrationDirection.Down, steps[0].Direction);
             Assert.Equal("V1", steps[1].Name);
