@@ -31,9 +31,93 @@ namespace Blaxpro.Sql
             this.migrations.Add(migration.Name, migration);
         }
 
-        public IMigrableDb getFor(IDb db)
+        public IEnumerable<IMigrationStep> getHistory(IDb db)
         {
-            return new PrvMigrableDb(this, db);
+            IDictionary<string, IMigration> migrations;
+
+            migrations = prv_getAllMigrations(this.migrations.Values);
+
+            using (ITransaction transaction = db.transact())
+            {
+                prv_assertIsInitialized(transaction);
+
+                return prv_getMigrationHistory(transaction)
+                    .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
+                    .ToList();
+            }
+        }
+
+        public bool isInitialized(IDb db)
+        {
+            using (ITransaction transaction = db.transact())
+                return prv_existsMigrationsTable(transaction);
+        }
+
+        public IReadOnlyList<IMigrationStep> upgrade(IDb db)
+        {
+            IReadOnlyList<IMigrationStep> executedSteps;
+            IDictionary<string, IMigration> migrations;
+
+            migrations = prv_getAllMigrations(this.migrations.Values);
+
+            try
+            {
+                using (ITransaction transaction = db.transact())
+                {
+                    IDictionary<string, IMigrationStep> migrationHistory;
+
+                    prv_assertIsInitialized(transaction);
+
+                    migrationHistory = prv_getMigrationHistory(transaction)
+                            .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
+                            .ToDictionary(step => step.Name);
+
+                    executedSteps = prv_upgrade(transaction, this.migrations.Values, ref migrationHistory)
+                        .ToList()
+                        .AsReadOnly();
+
+                    transaction.saveChanges();
+                }
+            }
+            catch (DbCommandExecutionException ex)
+            {
+                throw new DbMigrationException("Error upgrading database", ex);
+            }
+
+            return executedSteps;
+        }
+
+        public IReadOnlyList<IMigrationStep> remove(IDb db, string migrationName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void initialize(IDb db)
+        {
+            using (ITransaction transaction = db.transact())
+            {
+                IMigrationStep[] history;
+                bool migrationsTableExists;
+
+                migrationsTableExists = prv_existsMigrationsTable(transaction);
+
+                if (migrationsTableExists)
+                    throw new MigrationsSetupException($"Database migrations system has already been initialized.");
+
+                prv_createMigrationsTable(transaction);
+                migrationsTableExists = prv_existsMigrationsTable(transaction);
+
+                if (migrationsTableExists == false)
+                    throw new MigrationsSetupException($"Migrations table could not been created.");
+
+                history = prv_getMigrationHistory(transaction)
+                    .ToArray();
+
+                if (history.Length != 0)
+                    throw new MigrationsSetupException($"New migrations table is not empty!");
+
+                transaction.saveChanges();
+            }
         }
 
         protected abstract void prv_createMigrationsTable(ITransaction transaction);
@@ -120,145 +204,6 @@ namespace Blaxpro.Sql
                 return step;
             else
                 throw new MigrationsSetupException($@"Missing migration instance for '{step.Name}'.");
-        }
-
-        private class PrvMigrableDb : IMigrableDb
-        {
-            private readonly AbstractDbMigrator migrator;
-
-            public PrvMigrableDb(AbstractDbMigrator migrator, IDb db)
-            {
-                this.migrator = migrator;
-                this.Db = db;
-            }
-
-            public IDb Db { get; }
-            public IEnumerable<IMigrationStep> History
-            {
-                get
-                {
-                    IDictionary<string, IMigration> migrations;
-
-                    migrations = prv_getAllMigrations(this.migrator.migrations.Values);
-
-                    using (ITransaction transaction = this.Db.transact())
-                    {
-                        this.migrator.prv_assertIsInitialized(transaction);
-
-                        return this.migrator
-                            .prv_getMigrationHistory(transaction)
-                            .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
-                            .ToList();
-                    }
-                }
-            }
-
-            public bool IsInitialized
-            {
-                get
-                {
-                    using (ITransaction transaction = this.Db.transact())
-                        return this.migrator.prv_existsMigrationsTable(transaction);
-                }
-            }
-
-            public void initialize()
-            {
-                using (ITransaction transaction = this.Db.transact())
-                {
-                    IMigrationStep[] history;
-                    bool migrationsTableExists;
-
-                    migrationsTableExists = this.migrator.prv_existsMigrationsTable(transaction);
-
-                    if (migrationsTableExists)
-                        throw new MigrationsSetupException($"Database migrations system has already been initialized.");
-
-                    this.migrator.prv_createMigrationsTable(transaction);
-                    migrationsTableExists = this.migrator.prv_existsMigrationsTable(transaction);
-
-                    if (migrationsTableExists == false)
-                        throw new MigrationsSetupException($"Migrations table could not been created.");
-
-                    history = this.migrator
-                        .prv_getMigrationHistory(transaction)
-                        .ToArray();
-
-                    if (history.Length != 0)
-                        throw new MigrationsSetupException($"New migrations table is not empty!");
-
-                    transaction.saveChanges();
-                }
-            }
-
-            public IReadOnlyList<IMigrationStep> upgrade()
-            {
-                IReadOnlyList<IMigrationStep> executedSteps;
-                IDictionary<string, IMigration> migrations;
-
-                migrations = prv_getAllMigrations(this.migrator.migrations.Values);
-
-                try
-                {
-                    using (ITransaction transaction = this.Db.transact())
-                    {
-                        IDictionary<string, IMigrationStep> migrationHistory;
-
-                        this.migrator.prv_assertIsInitialized(transaction);
-
-                        migrationHistory = this.migrator
-                                .prv_getMigrationHistory(transaction)
-                                .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
-                                .ToDictionary(step => step.Name);
-
-                        executedSteps = this.migrator
-                            .prv_upgrade(transaction, this.migrator.migrations.Values, ref migrationHistory)
-                            .ToList()
-                            .AsReadOnly();
-
-                        transaction.saveChanges();
-                    }
-                }
-                catch (DbCommandExecutionException ex)
-                {
-                    throw new DbMigrationException("Error upgrading database", ex);
-                }
-
-                return executedSteps;
-            }
-
-            public IReadOnlyList<IMigrationStep> remove(string migrationName)
-            {
-                IReadOnlyList<IMigrationStep> executedSteps;
-                IDictionary<string, IMigration> migrations;
-
-                if (false == this.migrator.migrations.ContainsKey(migrationName))
-                    throw new MigrationsSetupException($"Migration '{migrationName}' not found.");
-
-                migrations = prv_getChildMigrations(migrationName, this.migrator.migrations.Values);
-
-                using (ITransaction transaction = this.Db.transact())
-                {
-                    IDictionary<string, IMigrationStep> migrationHistory;
-
-                    this.migrator.prv_assertIsInitialized(transaction);
-
-                    migrationHistory = this.migrator
-                            .prv_getMigrationHistory(transaction)
-                            .Select(step => prv_assertStepHasMatchingMigration(step, migrations))
-                            .ToDictionary(step => step.Name);
-
-                    executedSteps = this.migrator
-                        .prv_remove(transaction, this.migrator.migrations.Values, ref migrationHistory)
-                        .ToList()
-                        .AsReadOnly();
-
-                    transaction.saveChanges();
-
-                }
-                throw new NotImplementedException();
-            }
-
         }
     }
 }

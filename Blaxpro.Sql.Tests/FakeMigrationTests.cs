@@ -38,46 +38,46 @@ namespace Blaxpro.Sql.Tests
         [Fact]
         public void fake_migration_tests()
         {
-            IDbMigrator dbMigrator;
-            IMigrableDb migrableDb;
+            IDbMigrator migrator;
             IReadOnlyList<IMigrationStep> steps;
             IList<IMigrationStep> migrationHistory;
 
-            dbMigrator = new PrvDbMigrator();
+            migrator = new PrvDbMigrator();
 
-            dbMigrator.add(this.migrations["V2"]);
-            migrableDb = dbMigrator.getFor(this.db);
+            migrator.add(this.migrations["V2"]);
 
-            Assert.False(migrableDb.IsInitialized);
-            Assert.Throws<MigrationsSetupException>(() => migrableDb.History);
-            Assert.Throws<MigrationsSetupException>(() => migrableDb.upgrade());
+            Assert.False(migrator.isInitialized(this.db));
+            Assert.Throws<MigrationsSetupException>(() => migrator.getHistory(this.db));
+            Assert.Throws<MigrationsSetupException>(() => migrator.upgrade(this.db));
 
-            migrableDb.initialize();
+            migrator.initialize(this.db);
 
-            Assert.True(migrableDb.IsInitialized);
+            Assert.True(migrator.isInitialized(this.db));
 
-            steps = migrableDb.upgrade();
+            steps = migrator.upgrade(this.db);
             Assert.Equal(2, steps.Count);
             Assert.Equal("V1", steps[0].Name);
             Assert.Equal(MigrationDirection.Up, steps[0].Direction);
             Assert.Equal("V2", steps[1].Name);
             Assert.Equal(MigrationDirection.Up, steps[1].Direction);
 
-            steps = migrableDb.upgrade();
+            steps = migrator.upgrade(this.db);
             Assert.Empty(steps);
 
-            dbMigrator.add(this.migrations["V3"]);
-            migrableDb = dbMigrator.getFor(this.db);
-            Assert.Throws<DbMigrationException>(migrableDb.upgrade);
+            migrator.add(this.migrations["V3"]);
+            Assert.Throws<DbMigrationException>(() => migrator.upgrade(this.db));
 
-            migrationHistory = migrableDb.History.ToList();
+            migrationHistory = migrator
+                .getHistory(this.db)
+                .ToList();
+
             Assert.Equal(2, migrationHistory.Count);
             Assert.Equal("V1", migrationHistory[0].Name);
             Assert.Equal(MigrationDirection.Up, steps[0].Direction);
             Assert.Equal("V2", migrationHistory[1].Name);
             Assert.Equal(MigrationDirection.Up, steps[1].Direction);
 
-            steps = migrableDb.remove("V1");
+            steps = migrator.remove(this.db, "V1");
 
             Assert.Equal(2, steps.Count);
             Assert.Equal("V2", steps[0].Name);
@@ -85,7 +85,10 @@ namespace Blaxpro.Sql.Tests
             Assert.Equal("V1", steps[1].Name);
             Assert.Equal(MigrationDirection.Down, steps[1].Direction);
 
-            migrationHistory = migrableDb.History.ToList();
+            migrationHistory = migrator
+                .getHistory(this.db)
+                .ToList();
+
             Assert.Equal(4, migrationHistory.Count);
 
             Assert.Equal("V1", migrationHistory[0].Name);
@@ -122,6 +125,7 @@ namespace Blaxpro.Sql.Tests
                 this.existsMigrationsTable = false;
                 this.fakeMigrationHistory = new List<IMigrationStep>();
             }
+
             protected override void prv_createMigrationsTable(ITransaction transaction)
             {
                 this.existsMigrationsTable = true;
