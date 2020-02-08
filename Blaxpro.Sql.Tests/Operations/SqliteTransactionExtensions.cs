@@ -1,14 +1,9 @@
 ﻿using Blaxpro.Sql.Models;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Blaxpro.Sql.Extensions.Queries;
-using Blaxpro.Sql.Extensions.DbTransactions;
 using System;
 using Blaxpro.Sql.Exceptions;
 using System.Diagnostics;
 
-namespace Blaxpro.Sql.Tests
+namespace Blaxpro.Sql.Tests.Operations
 {
     public static class SqliteTransactionExtensions
     {

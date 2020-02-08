@@ -1,13 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Data.SQLite;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using Blaxpro.Sql.Exceptions;
 using Blaxpro.Sql.Models;
+using Blaxpro.Sql.Tests.Models;
+using Blaxpro.Sql.Tests.Operations;
 using Xunit;
 
 namespace Blaxpro.Sql.Tests

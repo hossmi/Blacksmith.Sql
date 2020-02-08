@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blaxpro.Sql.Tests
+namespace Blaxpro.Sql.Tests.Fakes
 {
     public class FakeMigration : IMigration
     {

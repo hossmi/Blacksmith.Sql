@@ -4,7 +4,7 @@ using System.Data;
 using Blaxpro.Sql.Models;
 using Xunit;
 
-namespace Blaxpro.Sql.Tests
+namespace Blaxpro.Sql.Tests.Fakes
 {
     public class FakeTransaction : ITransaction
     {

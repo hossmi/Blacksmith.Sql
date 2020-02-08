@@ -1,4 +1,4 @@
-﻿namespace Blaxpro.Sql.Tests
+﻿namespace Blaxpro.Sql.Tests.Models
 {
     public class Product
     {

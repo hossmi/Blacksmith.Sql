@@ -7,10 +7,11 @@ using Blaxpro.Sql.Extensions.DbTransactions;
 using Blaxpro.Sql.Exceptions;
 using System.Diagnostics;
 using System;
+using Blaxpro.Sql.Tests.Models;
 
-namespace Blaxpro.Sql.Tests
+namespace Blaxpro.Sql.Tests.Operations
 {
-    public static class TransactionTestExtensions
+    public static class SqlServerTransactionExtensions
     {
         public static IDb dropProductsTable(this IDb db)
         {
