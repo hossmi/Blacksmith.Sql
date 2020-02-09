@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Blaxpro.Sql\Blaxpro.Sql.csproj" />
+    <ProjectReference Include="..\Blacksmith.Sql\Blacksmith.Sql.csproj" />
   </ItemGroup>
 
   <ItemGroup>
