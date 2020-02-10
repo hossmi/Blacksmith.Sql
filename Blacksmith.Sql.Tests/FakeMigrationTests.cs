@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blaxpro.Sql.Exceptions;
-using Blaxpro.Sql.Models;
-using Blaxpro.Sql.Tests.Fakes;
+using Blacksmith.Sql.Exceptions;
+using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Tests.Fakes;
 using Xunit;
 
-namespace Blaxpro.Sql.Tests
+namespace Blacksmith.Sql.Tests
 {
     public class FakeMigrationTests
     {

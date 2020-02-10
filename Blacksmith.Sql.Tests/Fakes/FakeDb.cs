@@ -1,7 +1,7 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
 using System;
 
-namespace Blaxpro.Sql.Tests.Fakes
+namespace Blacksmith.Sql.Tests.Fakes
 {
     public class FakeDb : IDb
     {

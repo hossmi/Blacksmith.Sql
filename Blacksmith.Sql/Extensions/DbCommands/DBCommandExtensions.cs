@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Blacksmith.Extensions.Enumerables;
+using System.Collections.Generic;
 using System.Data;
 
-namespace Blaxpro.Sql.Extensions.DbCommands
+namespace Blacksmith.Sql.Extensions.DbCommands
 {
     public static class DBCommandExtensions
     {
@@ -13,10 +14,19 @@ namespace Blaxpro.Sql.Extensions.DbCommands
         }
 
         public static T setParameters<T>(this T command, IEnumerable<KeyValuePair<string, object>> parameters)
-            where T: class, IDbCommand
+            where T : class, IDbCommand
         {
             foreach (var parameter in parameters)
                 prv_setParameter(command, parameter.Key, parameter.Value);
+
+            return command;
+        }
+
+        public static T setParameters<T>(this T command, IEnumerable<IDbDataParameter> parameters)
+            where T : class, IDbCommand
+        {
+            foreach (var parameter in parameters)
+                command.Parameters.Add(parameter);
 
             return command;
         }

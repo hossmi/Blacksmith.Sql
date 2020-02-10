@@ -9,7 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blaxpro.Validations" Version="1.2.2" />
+    <PackageReference Include="Blacksmith.Extensions.Enumerables" Version="1.1.0" />
+    <PackageReference Include="Blacksmith.Sql.Queries" Version="1.1.0" />
+    <PackageReference Include="Blacksmith.Sql.Queries.MsSql" Version="1.2.0" />
+    <PackageReference Include="Blacksmith.Validations" Version="2.2.0" />
   </ItemGroup>
 
 </Project>

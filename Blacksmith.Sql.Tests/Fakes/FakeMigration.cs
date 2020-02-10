@@ -1,8 +1,9 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Queries;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blaxpro.Sql.Tests.Fakes
+namespace Blacksmith.Sql.Tests.Fakes
 {
     public class FakeMigration : IMigration
     {

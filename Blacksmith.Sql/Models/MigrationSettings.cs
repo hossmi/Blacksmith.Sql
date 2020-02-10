@@ -1,4 +1,4 @@
-﻿namespace Blaxpro.Sql.Models
+﻿namespace Blacksmith.Sql.Models
 {
     public class MigrationSettings
     {

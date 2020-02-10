@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using Blaxpro.Sql.Models;
-using Blaxpro.Sql.Tests.Models;
-using Blaxpro.Sql.Tests.Operations;
+using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Tests.Models;
+using Blacksmith.Sql.Tests.Operations;
 using Xunit;
 
-namespace Blaxpro.Sql.Tests
+namespace Blacksmith.Sql.Tests
 {
     public class DbTests
     {

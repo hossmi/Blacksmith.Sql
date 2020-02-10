@@ -1,6 +1,6 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
 
-namespace Blaxpro.Sql
+namespace Blacksmith.Sql
 {
     public interface IDb
     {

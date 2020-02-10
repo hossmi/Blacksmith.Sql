@@ -1,9 +1,10 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
 using System;
-using Blaxpro.Sql.Exceptions;
+using Blacksmith.Sql.Exceptions;
 using System.Diagnostics;
+using Blacksmith.Sql.Queries.MsSql;
 
-namespace Blaxpro.Sql.Tests.Operations
+namespace Blacksmith.Sql.Tests.Operations
 {
     public static class SqliteTransactionExtensions
     {
@@ -15,17 +16,17 @@ namespace Blaxpro.Sql.Tests.Operations
 
         private static int prv_createProductsTable(ITransaction transaction)
         {
-            Query query;
+            SqlStatement statement;
 
-            query = @"
+            statement = new SqlStatement(@"
 CREATE TABLE products
 (
     id INTEGER PRIMARY KEY,
     name nvarchar(256) NOT NULL,
     price decimal(10,2) NOT NULL
-);";
+);");
 
-            return transaction.set(query);
+            return transaction.set(statement);
         }
 
         private static void prv_migrate(IDb db, Func<ITransaction, int> transactionDelegate)

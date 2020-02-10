@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections;
+﻿using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Exceptions;
+using Blacksmith.Sql.Models;
+using Blacksmith.Validations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blaxpro.Sql.Exceptions;
-using Blaxpro.Sql.Models;
-using Blaxpro.Validations;
 
-namespace Blaxpro.Sql
+namespace Blacksmith.Sql
 {
 
     public abstract class AbstractDbMigrator : IDbMigrator
     {
-        protected readonly Asserts assert;
+        protected readonly IValidator assert;
         private readonly IDictionary<string, IMigration> migrations;
 
         public AbstractDbMigrator()
         {
-            this.assert = Asserts.Assert;
-
+            this.assert = Asserts.Default;
             this.migrations = new Dictionary<string, IMigration>();
         }
 
@@ -26,7 +25,9 @@ namespace Blaxpro.Sql
         public void add(IMigration migration)
         {
             this.assert.isNotNull(migration);
-            this.assert.isFalse(this.migrations.ContainsKey(migration.Name), $"The migration '{migration.Name}' has already added.");
+
+            if (this.migrations.ContainsKey(migration.Name))
+                throw new MigrationsSetupException($"The migration '{migration.Name}' has already added.");
 
             this.migrations.Add(migration.Name, migration);
         }

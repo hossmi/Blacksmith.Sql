@@ -1,7 +1,7 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
 using System.Collections.Generic;
 
-namespace Blaxpro.Sql
+namespace Blacksmith.Sql
 {
     public interface IDbMigrator
     {

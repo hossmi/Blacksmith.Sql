@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Exceptions;
+using Blacksmith.Sql.Extensions.DbCommands;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using Blaxpro.Sql.Exceptions;
-using Blaxpro.Sql.Extensions.DbCommands;
-using Blaxpro.Sql.Models;
 
-namespace Blaxpro.Sql.Models
+namespace Blacksmith.Sql.Models
 {
     internal class Transaction : ITransaction
     {
@@ -54,9 +54,9 @@ namespace Blaxpro.Sql.Models
             return prv_transact(query, prv_getTransaction(), c => c.ExecuteScalar());
         }
 
-        public int set(IQuery query)
+        public int set(ISqlStatement statement)
         {
-            return prv_transact(query, prv_getTransaction(), c => c.ExecuteNonQuery());
+            return prv_transact(statement, prv_getTransaction(), c => c.ExecuteNonQuery());
         }
 
         private IDbTransaction prv_getTransaction()
@@ -82,15 +82,15 @@ namespace Blaxpro.Sql.Models
             return this.transaction;
         }
 
-        private static T prv_transact<T>(IQuery query, IDbTransaction transaction, Func<IDbCommand, T> commandExecutor)
+        private static T prv_transact<T>(ISqlStatement statement, IDbTransaction transaction, Func<IDbCommand, T> commandExecutor)
         {
             using (IDbCommand command = transaction.Connection.CreateCommand())
             {
                 T result;
 
                 command.Transaction = transaction;
-                command.CommandText = query.Statement;
-                command.setParameters(query.Parameters);
+                command.CommandText = statement.Statement;
+                command.setParameters(statement.Parameters);
 
                 try
                 {

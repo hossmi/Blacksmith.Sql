@@ -1,8 +1,10 @@
-﻿using Blaxpro.Sql.Extensions.DbTransactions;
-using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Queries.Extensions;
+using Blacksmith.Sql.Queries.MsSql;
 using System.Collections.Generic;
 
-namespace Blaxpro.Sql.Tests
+namespace Blacksmith.Sql.Tests
 {
     public class V3WrongMigration : AbstractMigration
     {
@@ -21,7 +23,7 @@ namespace Blaxpro.Sql.Tests
 
         protected override IEnumerable<IQuery> prv_getUpgrades()
         {
-            yield return (Query)"update BOOOOOOOOM;";
+            yield return new SqlQuery().addTables("update BOOOOOOOOM;");
         }
     }
 }

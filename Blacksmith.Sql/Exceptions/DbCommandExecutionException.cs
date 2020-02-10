@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Blaxpro.Sql.Exceptions
+namespace Blacksmith.Sql.Exceptions
 {
     [Serializable]
     public class DbCommandExecutionException : Exception

@@ -1,15 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Blaxpro.Sql.Models;
-using Blaxpro.Sql.Extensions.Queries;
-using Blaxpro.Sql.Extensions.DbTransactions;
-using Blaxpro.Sql.Exceptions;
+using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Extensions.Queries;
+using Blacksmith.Sql.Exceptions;
 using System.Diagnostics;
 using System;
-using Blaxpro.Sql.Tests.Models;
+using Blacksmith.Sql.Tests.Models;
+using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Queries.MsSql;
+using Blacksmith.Sql.Queries.Extensions;
+using System.Data.SqlClient;
 
-namespace Blaxpro.Sql.Tests.Operations
+namespace Blacksmith.Sql.Tests.Operations
 {
     public static class SqlServerTransactionExtensions
     {
@@ -28,50 +31,59 @@ namespace Blaxpro.Sql.Tests.Operations
         public static IEnumerable<Product> getProductsByPriceRange(this ITransaction transaction
             , decimal minPrice, decimal maxPrice)
         {
-            Query query;
-
-            query = @"
-SELECT * 
-FROM products
-WHERE @minPrice <= products.price 
-  AND products.price <= @maxPrice";
-
-            query.setParameter(nameof(minPrice), minPrice);
-            query.setParameter(nameof(maxPrice), maxPrice);
-
-            return transaction
-                .get(query)
+            return new SqlQuery()
+                .addColumns("*")
+                .addTables("products")
+                .addFilter("@minPrice <= products.price", new SqlParameter
+                {
+                    ParameterName = nameof(minPrice),
+                    Value = minPrice,
+                    DbType = DbType.Double,
+                })
+                .addFilter("products.price <= @maxPrice", new SqlParameter
+                {
+                    ParameterName = nameof(maxPrice),
+                    Value = maxPrice,
+                    DbType = DbType.Double,
+                })
+                .getRecords(transaction)
                 .Select(prv_buildProduct);
         }
 
         public static int insertProduct(this ITransaction transaction, Product product)
         {
-            Query query;
+            ISqlStatement statement;
 
-            query = $@"INSERT INTO products (name, price) VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})";
-            query.setParameters(product);
+            statement = new SqlStatement($@"
+INSERT INTO products (name, price) 
+VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})");
 
-            return transaction.set(query);
+            statement.setParameters(product);
+
+            return transaction.set(statement);
         }
 
         public static int updateProductName(this ITransaction transaction, long productId, string name)
         {
-            Query query;
+            ISqlStatement statement;
+            IDbDataParameter parameter;
 
-            query = @"
+            statement = new SqlStatement(@"
 UPDATE products 
 SET name = @name
-WHERE id = @id";
+WHERE id = @id");
 
-            query.setParameter("name", name);
-            query.setParameter("id", productId);
+            parameter = statement.createParameter();
+            parameter
+            statement.setParameter("name", name);
+            statement.setParameter("id", productId);
 
-            return transaction.set(query);
+            return transaction.set(statement);
         }
 
         public static int deleteProducts(this ITransaction transaction)
         {
-            return transaction.set("DELETE FROM products");
+            return transaction.set(new SqlStatement("DELETE FROM products"));
         }
 
         private static void prv_migrate(IDb db, Func<ITransaction, int> transactionDelegate)
@@ -92,23 +104,23 @@ WHERE id = @id";
 
         private static int prv_createProductsTable(ITransaction transaction)
         {
-            Query query;
+            ISqlStatement query;
 
-            query = @"
+            query = new SqlStatement(@"
 CREATE TABLE products
 (
     id BIGINT NOT NULL IDENTITY(1,1),
     name nvarchar(256) NOT NULL,
     price decimal(10,2) NOT NULL,
     PRIMARY KEY (id)
-);";
+);");
 
             return transaction.set(query);
         }
 
         private static int prv_dropProductsTable(ITransaction transaction)
         {
-            return transaction.set(@"DROP TABLE products;");
+            return transaction.set(new SqlStatement(@"DROP TABLE products;"));
         }
 
         private static Product prv_buildProduct(IDataRecord r)

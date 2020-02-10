@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Blaxpro.Sql.Models
+namespace Blacksmith.Sql.Models
 {
     public interface IMigrationStep
     {

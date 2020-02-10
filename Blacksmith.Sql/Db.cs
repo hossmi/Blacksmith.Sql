@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace Blaxpro.Sql
+namespace Blacksmith.Sql
 {
     public class Db : AbstractDb
     {

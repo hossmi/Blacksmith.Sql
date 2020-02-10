@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using Blaxpro.Sql.Models;
+using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Queries;
 using Xunit;
 
-namespace Blaxpro.Sql.Tests.Fakes
+namespace Blacksmith.Sql.Tests.Fakes
 {
     public class FakeTransaction : ITransaction
     {

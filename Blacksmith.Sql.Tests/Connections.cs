@@ -5,13 +5,13 @@ using System.Data.SQLite;
 using System.IO;
 using Xunit;
 
-namespace Blaxpro.Sql.Tests
+namespace Blacksmith.Sql.Tests
 {
     public static class Connections
     {
         public static IDbConnection getSqlServerConnection()
         {
-            return new SqlConnection(@"Data Source=(localdb)\v11.0;Initial Catalog=blaxpro-sql-tests;Integrated Security=True;Pooling=False");
+            return new SqlConnection(@"Data Source=(localdb)\v11.0;Initial Catalog=Blacksmith-sql-tests;Integrated Security=True;Pooling=False");
         }
 
         public static IDbConnection getSqliteConnection()

@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
-using Blaxpro.Sql.Models;
+using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Queries.Extensions;
+using Blacksmith.Sql.Queries.MsSql;
+using Blacksmith.Sql.Models;
 
-namespace Blaxpro.Sql
+namespace Blacksmith.Sql
 {
     public class SqlDbMigrator : AbstractDbMigrator
     {
@@ -10,7 +13,7 @@ namespace Blaxpro.Sql
         public SqlDbMigrator(MigrationSettings settings)
         {
             this.assert.isNotNull(settings);
-            this.assert.stringIsNotEmpty(settings.MigrationsTable);
+            this.assert.isFilled(settings.MigrationsTable);
             this.settings = settings;
         }
 
@@ -32,7 +35,7 @@ namespace Blaxpro.Sql
 
         protected override void prv_createMigrationsTable(ITransaction transaction)
         {
-            Query query = $@"
+            ISqlStatement query = new SqlStatement($@"
 CREATE TABLE [{this.settings.Schema}].[{this.settings.MigrationsTable}]
 (
     id INTEGER PRIMARY KEY,
@@ -40,7 +43,7 @@ CREATE TABLE [{this.settings.Schema}].[{this.settings.MigrationsTable}]
     [date] DATETIME NOT NULL,
     [action] NVARCHAR(32) NOT NULL
 );
-GO";
+GO");
 
             transaction.set(query);
         }

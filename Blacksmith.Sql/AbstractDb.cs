@@ -1,7 +1,7 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
 using System.Data;
 
-namespace Blaxpro.Sql
+namespace Blacksmith.Sql
 {
     public abstract class AbstractDb : IDb
     {

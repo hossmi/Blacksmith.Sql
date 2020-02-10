@@ -1,46 +1,73 @@
-﻿using Blaxpro.Sql.Models;
-using System;
+﻿using Blacksmith.Extensions.Enumerables;
+using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Queries.MsSql;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 
-namespace Blaxpro.Sql.Extensions.Queries
+namespace Blacksmith.Sql.Extensions.Queries
 {
     public static class QueryExtensions
     {
-        public static TQuery setParameters<TQuery>(this TQuery query, object parameters) where TQuery : Query
+        public static TStatement setParameters<TStatement>(this TStatement query, object parameters) 
+            where TStatement : ISqlStatement
         {
-            IEnumerable<PropertyInfo> properties;
-
-            properties = parameters
+            parameters
                 .GetType()
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty)
-                .Where(p => p.Name != nameof(IQuery.Parameters) && p.Name != nameof(IQuery.Statement));
+                .forEach(p =>
+                {
+                    IDbDataParameter parameter;
 
-            foreach (PropertyInfo p in properties)
-                query[p.Name] = p.GetValue(parameters);
-
-            return query;
-        }
-
-        public static TQuery setParameters<TQuery>(this TQuery query, IEnumerable<KeyValuePair<string, object>> parameters) where TQuery : Query
-        {
-            foreach (var p in parameters)
-                query[p.Key] = p.Value;
+                    parameter = query.createParameter();
+                    parameter.ParameterName = p.Name;
+                    parameter.Value = p.GetValue(parameters);
+                    query.Parameters.Add(parameter);
+                });
 
             return query;
         }
 
-        public static TQuery setParameter<TQuery>(this TQuery query, string name, object value) where TQuery : Query
+
+        public static TStatement setParameters<TStatement>(this TStatement query, IEnumerable<KeyValuePair<string, object>> parameters) 
+            where TStatement : ISqlStatement
         {
-            query[name] = value;
+            foreach (KeyValuePair<string, object> parameter in parameters)
+            {
+                setParameter(query, parameter);
+            }
+            parameters
+                .Select(p => new SqlParameter(p.Key, p.Value))
+                .forEach(query.Parameters.Add);
+
             return query;
         }
 
-        public static IQuery removeParameters<TQuery>(this TQuery query) where TQuery: Query
+        public static TStatement setParameter<TStatement>(this TStatement query, string name, object value) 
+            where TStatement : ISqlStatement
         {
-            query.clearParameters();
+            IDbDataParameter parameter;
+
+            parameter = query.createParameter();
+            parameter.ParameterName = name;
+            parameter.Value = value;
+            query.Parameters.Add(parameter);
+
             return query;
+        }
+
+        public static TQuery clearParameters<TQuery>(this TQuery query) where TQuery: IQuery
+        {
+            query.Parameters.Clear();
+            return query;
+        }
+
+        public static IEnumerable<IDataRecord> getRecords(this IQuery query, ITransaction transaction)
+        {
+            return transaction.get(query);
         }
     }
 }

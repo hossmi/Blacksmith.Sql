@@ -1,17 +1,16 @@
-﻿using Blaxpro.Validations;
-using System;
+﻿using Blacksmith.Sql.Queries;
+using Blacksmith.Validations;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Blaxpro.Sql.Models
+namespace Blacksmith.Sql.Models
 {
     public abstract class AbstractMigration : IMigration
     {
-        private readonly Asserts asserts;
+        private readonly IValidator asserts;
 
         public AbstractMigration()
         {
-            this.asserts = Asserts.Assert;
+            this.asserts = Asserts.Default;
         }
 
         public string Name
@@ -19,7 +18,7 @@ namespace Blaxpro.Sql.Models
             get
             {
                 string name = prv_getName();
-                this.asserts.stringIsNotEmpty(name, "Migration name cannot be empty.");
+                this.asserts.isFilled(name);
 
                 return name;
             }
@@ -30,7 +29,7 @@ namespace Blaxpro.Sql.Models
             IEnumerable<IMigration> migrations;
 
             migrations = prv_getDependencies();
-            this.asserts.isNotNull(migrations, "Migration dependencies collection cannot be null.");
+            this.asserts.isNotNull(migrations);
 
             return migrations;
         }
@@ -40,7 +39,7 @@ namespace Blaxpro.Sql.Models
             IEnumerable<IQuery> queries;
 
             queries = prv_getDowngrades();
-            this.asserts.isNotNull(queries, "Downgrade queries collection cannot be null.");
+            this.asserts.isNotNull(queries);
 
             return queries;
         }
@@ -50,7 +49,7 @@ namespace Blaxpro.Sql.Models
             IEnumerable<IQuery> queries;
 
             queries = prv_getUpgrades();
-            this.asserts.isNotNull(queries, "Upgrade queries collection cannot be null.");
+            this.asserts.isNotNull(queries);
 
             return queries;
         }

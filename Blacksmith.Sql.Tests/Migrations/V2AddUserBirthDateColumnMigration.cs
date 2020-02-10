@@ -1,7 +1,8 @@
-﻿using Blaxpro.Sql.Models;
+﻿using Blacksmith.Sql.Models;
+using Blacksmith.Sql.Queries;
 using System.Collections.Generic;
 
-namespace Blaxpro.Sql.Tests
+namespace Blacksmith.Sql.Tests
 {
     public class V2AddUserBirthDateColumnMigration : IMigration
     {

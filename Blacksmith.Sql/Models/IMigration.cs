@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Blacksmith.Sql.Queries;
 using System.Collections.Generic;
 
-namespace Blaxpro.Sql.Models
+namespace Blacksmith.Sql.Models
 {
     public interface IMigration 
     {
