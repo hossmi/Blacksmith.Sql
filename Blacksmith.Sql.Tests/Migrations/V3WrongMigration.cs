@@ -21,9 +21,9 @@ namespace Blacksmith.Sql.Tests
             return WrongMigration;
         }
 
-        protected override IEnumerable<IQuery> prv_getUpgrades()
+        protected override IEnumerable<ISqlStatement> prv_getUpgrades()
         {
-            yield return new SqlQuery().addTables("update BOOOOOOOOM;");
+            yield return new SqlStatement("update BOOOOOOOOM;");
         }
     }
 }

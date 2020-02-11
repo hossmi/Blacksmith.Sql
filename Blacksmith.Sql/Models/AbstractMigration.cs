@@ -34,9 +34,9 @@ namespace Blacksmith.Sql.Models
             return migrations;
         }
 
-        public IEnumerable<IQuery> getDowngrades()
+        public IEnumerable<ISqlStatement> getDowngrades()
         {
-            IEnumerable<IQuery> queries;
+            IEnumerable<ISqlStatement> queries;
 
             queries = prv_getDowngrades();
             this.asserts.isNotNull(queries);
@@ -44,9 +44,9 @@ namespace Blacksmith.Sql.Models
             return queries;
         }
 
-        public IEnumerable<IQuery> getUpgrades()
+        public IEnumerable<ISqlStatement> getUpgrades()
         {
-            IEnumerable<IQuery> queries;
+            IEnumerable<ISqlStatement> queries;
 
             queries = prv_getUpgrades();
             this.asserts.isNotNull(queries);
@@ -54,11 +54,11 @@ namespace Blacksmith.Sql.Models
             return queries;
         }
 
-        protected abstract IEnumerable<IQuery> prv_getUpgrades();
+        protected abstract IEnumerable<ISqlStatement> prv_getUpgrades();
 
         protected abstract string prv_getName();
 
-        protected virtual IEnumerable<IQuery> prv_getDowngrades()
+        protected virtual IEnumerable<ISqlStatement> prv_getDowngrades()
         {
             yield break;
         }

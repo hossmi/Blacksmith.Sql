@@ -66,15 +66,12 @@ VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})");
         public static int updateProductName(this ITransaction transaction, long productId, string name)
         {
             ISqlStatement statement;
-            IDbDataParameter parameter;
 
             statement = new SqlStatement(@"
 UPDATE products 
 SET name = @name
 WHERE id = @id");
 
-            parameter = statement.createParameter();
-            parameter
             statement.setParameter("name", name);
             statement.setParameter("id", productId);
 

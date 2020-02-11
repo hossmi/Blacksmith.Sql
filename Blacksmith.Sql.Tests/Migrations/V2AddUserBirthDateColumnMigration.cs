@@ -1,5 +1,6 @@
 ﻿using Blacksmith.Sql.Models;
 using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Queries.MsSql;
 using System.Collections.Generic;
 
 namespace Blacksmith.Sql.Tests
@@ -15,14 +16,14 @@ namespace Blacksmith.Sql.Tests
             yield return new V1CreateUsersTableMigration();
         }
 
-        public IEnumerable<IQuery> getDowngrades()
+        public IEnumerable<ISqlStatement> getDowngrades()
         {
-            yield return (Query)"ALTER TABLE users DROM COLUMN birthdate;";
+            yield return new SqlStatement("ALTER TABLE users DROM COLUMN birthdate;");
         }
 
-        public IEnumerable<IQuery> getUpgrades()
+        public IEnumerable<ISqlStatement> getUpgrades()
         {
-            yield return (Query)"ALTER TABLE users ADD COLUMN birthdate DATETIME NULL;";
+            yield return new SqlStatement("ALTER TABLE users ADD COLUMN birthdate DATETIME NULL;");
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Blacksmith.Sql.Tests.Fakes
     {
         private bool disposed;
 
-        public event Func<IQuery, int> InvokedSet;
+        public event Func<ISqlStatement, int> InvokedSet;
 
         public FakeTransaction()
         {
@@ -38,9 +38,9 @@ namespace Blacksmith.Sql.Tests.Fakes
         {
         }
 
-        public int set(IQuery query)
+        public int set(ISqlStatement sqlStatement)
         {
-            return this.InvokedSet?.Invoke(query) ?? 0;
+            return this.InvokedSet?.Invoke(sqlStatement) ?? 0;
         }
     }
 }

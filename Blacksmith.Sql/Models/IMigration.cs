@@ -7,7 +7,7 @@ namespace Blacksmith.Sql.Models
     {
         string Name { get; }
         IEnumerable<IMigration> getDependencies();
-        IEnumerable<IQuery> getUpgrades();
-        IEnumerable<IQuery> getDowngrades();
+        IEnumerable<ISqlStatement> getUpgrades();
+        IEnumerable<ISqlStatement> getDowngrades();
     }
 }

@@ -36,12 +36,7 @@ namespace Blacksmith.Sql.Extensions.Queries
             where TStatement : ISqlStatement
         {
             foreach (KeyValuePair<string, object> parameter in parameters)
-            {
-                setParameter(query, parameter);
-            }
-            parameters
-                .Select(p => new SqlParameter(p.Key, p.Value))
-                .forEach(query.Parameters.Add);
+                setParameter(query, parameter.Key, parameter.Value);
 
             return query;
         }

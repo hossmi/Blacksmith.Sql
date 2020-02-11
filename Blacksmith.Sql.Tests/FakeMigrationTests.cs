@@ -4,6 +4,7 @@ using System.Linq;
 using Blacksmith.Sql.Exceptions;
 using Blacksmith.Sql.Models;
 using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Queries.MsSql;
 using Blacksmith.Sql.Tests.Fakes;
 using Xunit;
 
@@ -31,7 +32,7 @@ namespace Blacksmith.Sql.Tests
 
             this.migrations["V2"].Dependencies = new[] { this.migrations["V1"] };
             this.migrations["V3"].Dependencies = new[] { this.migrations["V1"], this.migrations["V2"] };
-            this.migrations["V3"].Upgrades = new IQuery[] { (Query)"BOOM" };
+            this.migrations["V3"].Upgrades = new ISqlStatement[] { new SqlStatement("BOOM") };
 
             this.db = new FakeDb();
             this.db.BeginTransaction += prv_db_BeginTransaction;
@@ -109,9 +110,9 @@ namespace Blacksmith.Sql.Tests
             transaction.InvokedSet += prv_transaction_InvokedSet;
         }
 
-        private static int prv_transaction_InvokedSet(IQuery query)
+        private static int prv_transaction_InvokedSet(ISqlStatement statement)
         {
-            if (query.Statement == "BOOM")
+            if (statement.Statement == "BOOM")
                 throw new DbCommandExecutionException(new Exception("Boooom"));
 
             return random.Next(1, 34);

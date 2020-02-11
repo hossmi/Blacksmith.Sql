@@ -1,5 +1,6 @@
 ﻿using Blacksmith.Sql.Models;
 using Blacksmith.Sql.Queries;
+using Blacksmith.Sql.Queries.MsSql;
 using System.Collections.Generic;
 
 namespace Blacksmith.Sql.Tests
@@ -8,20 +9,20 @@ namespace Blacksmith.Sql.Tests
     {
         public static string Create_users_table => "Create users table";
 
-        protected override IEnumerable<IQuery> prv_getUpgrades()
+        protected override IEnumerable<ISqlStatement> prv_getUpgrades()
         {
-            yield return (Query)@"
+            yield return new SqlStatement(@"
 CREATE TABLE users
 (
     id BIGINT NOT NULL IDENTITY(1,1),
     name nvarchar(256) NOT NULL,
     PRIMARY KEY (id)
-);";
+);");
         }
 
-        protected override IEnumerable<IQuery> prv_getDowngrades()
+        protected override IEnumerable<ISqlStatement> prv_getDowngrades()
         {
-            yield return (Query)@"DROP TABLE users;";
+            yield return new SqlStatement(@"DROP TABLE users;");
         }
 
         protected override string prv_getName()

@@ -16,8 +16,8 @@ namespace Blacksmith.Sql.Tests.Fakes
         }
 
         public string Name { get; }
-        public IEnumerable<IQuery> Upgrades { get; set; }
-        public IEnumerable<IQuery> Downgrades { get; set; }
+        public IEnumerable<ISqlStatement> Upgrades { get; set; }
+        public IEnumerable<ISqlStatement> Downgrades { get; set; }
         public IEnumerable<FakeMigration> Dependencies { get; set; }
 
         public IEnumerable<IMigration> getDependencies()
@@ -25,12 +25,12 @@ namespace Blacksmith.Sql.Tests.Fakes
             return this.Dependencies;
         }
 
-        public IEnumerable<IQuery> getDowngrades()
+        public IEnumerable<ISqlStatement> getDowngrades()
         {
             return this.Downgrades;
         }
 
-        public IEnumerable<IQuery> getUpgrades()
+        public IEnumerable<ISqlStatement> getUpgrades()
         {
             return this.Upgrades;
         }
