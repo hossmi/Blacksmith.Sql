@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blacksmith.Sql.Queries" Version="1.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112" />
@@ -28,8 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Blacksmith.Sql.Migrations.MsSql\Blacksmith.Sql.Migrations.MsSql.csproj" />
-    <ProjectReference Include="..\Blacksmith.Sql.Migrations\Blacksmith.Sql.Migrations.csproj" />
     <ProjectReference Include="..\Blacksmith.Sql\Blacksmith.Sql.csproj" />
   </ItemGroup>
 
