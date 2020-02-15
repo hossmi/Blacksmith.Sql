@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blacksmith.Sql", "Blacksmith.Sql\Blacksmith.Sql.csproj", "{504BFDA8-9267-4C4E-804F-6C3135FABE76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blacksmith.Sql", "Blacksmith.Sql\Blacksmith.Sql.csproj", "{504BFDA8-9267-4C4E-804F-6C3135FABE76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blacksmith.Sql.Tests", "Blacksmith.Sql.Tests\Blacksmith.Sql.Tests.csproj", "{F0A3BF21-D464-4402-A88A-5B2D5C7AA866}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blacksmith.Sql.Tests", "Blacksmith.Sql.Tests\Blacksmith.Sql.Tests.csproj", "{F0A3BF21-D464-4402-A88A-5B2D5C7AA866}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
