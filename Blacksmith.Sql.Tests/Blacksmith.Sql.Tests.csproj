@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blacksmith.Sql.Queries" Version="1.2.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112" />
     <PackageReference Include="xunit" Version="2.4.1" />

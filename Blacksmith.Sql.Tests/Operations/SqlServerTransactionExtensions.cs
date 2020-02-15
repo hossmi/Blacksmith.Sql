@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Blacksmith.Sql.Models;
+﻿using Blacksmith.Sql.Exceptions;
 using Blacksmith.Sql.Extensions.Queries;
-using Blacksmith.Sql.Exceptions;
-using System.Diagnostics;
-using System;
-using Blacksmith.Sql.Tests.Models;
+using Blacksmith.Sql.Models;
 using Blacksmith.Sql.Queries;
-using Blacksmith.Sql.Queries.MsSql;
 using Blacksmith.Sql.Queries.Extensions;
+using Blacksmith.Sql.Queries.MsSql;
+using Blacksmith.Sql.Tests.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Blacksmith.Sql.Tests.Operations
 {
@@ -33,7 +33,7 @@ namespace Blacksmith.Sql.Tests.Operations
         {
             return new SqlQuery()
                 .addColumns("*")
-                .addTables("products")
+                .addTables("FROM products")
                 .addFilter("@minPrice <= products.price", new SqlParameter
                 {
                     ParameterName = nameof(minPrice),
