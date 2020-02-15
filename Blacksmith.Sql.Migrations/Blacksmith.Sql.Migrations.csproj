@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blacksmith.Sql.Queries" Version="1.1.0" />
+    <PackageReference Include="Blacksmith.Validations" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Blacksmith.Sql\Blacksmith.Sql.csproj" />
+  </ItemGroup>
+
+</Project>
