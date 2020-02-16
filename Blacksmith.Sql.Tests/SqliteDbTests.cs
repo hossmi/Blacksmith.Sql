@@ -1,22 +1,22 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Blacksmith.Sql.Models;
 using Blacksmith.Sql.Tests.Models;
-using Blacksmith.Sql.Tests.SqlServerOperations;
+using Blacksmith.Sql.Tests.SqliteOperations;
 using Xunit;
 
 namespace Blacksmith.Sql.Tests
 {
-    public class DbTests
+    public class SqliteDbTests
     {
         [Fact]
-        public void sqlServer_tests()
+        public void sqlite_tests()
         {
             IDb db;
 
-            db = new Db(Connections.getSqlServerConnection);
+            db = new Db(Connections.getSqliteConnection);
             db.dropProductsTable();
-            db.createProductsTable();
+            db.createSqliteProductsTable();
 
             using (ITransaction transaction = db.transact())
             {

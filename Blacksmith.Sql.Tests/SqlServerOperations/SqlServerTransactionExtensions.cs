@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Blacksmith.Sql.Tests.Operations
+namespace Blacksmith.Sql.Tests.SqlServerOperations
 {
     public static class SqlServerTransactionExtensions
     {
