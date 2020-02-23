@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0</Version>
+    <SignAssembly>false</SignAssembly>
+    <Description>Yet another wrapper for sql commands.</Description>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PackageProjectUrl>https://github.com/hossmi/Blacksmith.Sql</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/hossmi/Blacksmith.Sql</RepositoryUrl>
+    <PackageTags>tools mapper</PackageTags>
+    <Authors>hossmi</Authors>
+    <PackageReleaseNotes>First release.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants />
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <ErrorReport>none</ErrorReport>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blacksmith.Extensions.Enumerables" Version="1.1.0" />
+    <PackageReference Include="Blacksmith.Sql.Queries" Version="1.4.1" />
+    <PackageReference Include="Blacksmith.Validations" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>
