@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Blacksmith.Sql.Tests
 {
-    public class DbTests
+    public class SqlServerTests
     {
         [Fact]
         public void sqlServer_tests()
