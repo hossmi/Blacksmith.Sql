@@ -3,7 +3,6 @@ using Blacksmith.Sql.Extensions.Queries;
 using Blacksmith.Sql.Models;
 using Blacksmith.Sql.Queries;
 using Blacksmith.Sql.Queries.Extensions;
-using Blacksmith.Sql.Queries.Sqlite;
 using Blacksmith.Sql.Tests.Models;
 using System;
 using System.Collections.Generic;
@@ -30,14 +29,14 @@ namespace Blacksmith.Sql.Tests.SqliteOperations
 
         public static int deleteProducts(this ITransaction transaction)
         {
-            return transaction.set(new SqliteStatement("DELETE FROM products"));
+            return transaction.set(new SqlStatement<SQLiteParameter>("DELETE FROM products"));
         }
 
         public static int insertProduct(this ITransaction transaction, Product product)
         {
             ISqlStatement statement;
 
-            statement = new SqliteStatement($@"
+            statement = new SqlStatement<SQLiteParameter>($@"
 INSERT INTO products (name, price) 
 VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})");
 
@@ -49,8 +48,8 @@ VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})");
         public static IEnumerable<Product> getProductsByPriceRange(this ITransaction transaction
             , decimal minPrice, decimal maxPrice)
         {
-            return new SqliteQuery()
-                .addColumns("*")
+            return new SqlQuery<SQLiteParameter>()
+                .addColumns("SELECT *")
                 .addTables("FROM products")
                 .addFilter("@minPrice <= products.price", new SQLiteParameter
                 {
@@ -72,7 +71,7 @@ VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})");
         {
             ISqlStatement statement;
 
-            statement = new SqliteStatement(@"
+            statement = new SqlStatement<SQLiteParameter>(@"
 UPDATE products 
 SET name = @name
 WHERE id = @id");
@@ -85,9 +84,9 @@ WHERE id = @id");
 
         private static int prv_createProductsTable(ITransaction transaction)
         {
-            SqliteStatement statement;
+            SqlStatement<SQLiteParameter> statement;
 
-            statement = new SqliteStatement(@"
+            statement = new SqlStatement<SQLiteParameter>(@"
 CREATE TABLE products
 (
     id INTEGER PRIMARY KEY,
@@ -116,7 +115,7 @@ CREATE TABLE products
 
         private static int prv_dropProductsTable(ITransaction transaction)
         {
-            return transaction.set(new SqliteStatement(@"DROP TABLE products;"));
+            return transaction.set(new SqlStatement<SQLiteParameter>(@"DROP TABLE products;"));
         }
 
         private static Product prv_buildProduct(IDataRecord r)

@@ -3,7 +3,6 @@ using Blacksmith.Sql.Extensions.Queries;
 using Blacksmith.Sql.Models;
 using Blacksmith.Sql.Queries;
 using Blacksmith.Sql.Queries.Extensions;
-using Blacksmith.Sql.Queries.MsSql;
 using Blacksmith.Sql.Tests.Models;
 using System;
 using System.Collections.Generic;
@@ -31,8 +30,8 @@ namespace Blacksmith.Sql.Tests.SqlServerOperations
         public static IEnumerable<Product> getProductsByPriceRange(this ITransaction transaction
             , decimal minPrice, decimal maxPrice)
         {
-            return new SqlQuery()
-                .addColumns("*")
+            return new SqlQuery<SqlParameter>()
+                .addColumns("SELECT *")
                 .addTables("FROM products")
                 .addFilter("@minPrice <= products.price", new SqlParameter
                 {
@@ -54,7 +53,7 @@ namespace Blacksmith.Sql.Tests.SqlServerOperations
         {
             ISqlStatement statement;
 
-            statement = new SqlStatement($@"
+            statement = new SqlStatement<SqlParameter>($@"
 INSERT INTO products (name, price) 
 VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})");
 
@@ -67,7 +66,7 @@ VALUES (@{nameof(Product.Name)}, @{nameof(Product.Price)})");
         {
             ISqlStatement statement;
 
-            statement = new SqlStatement(@"
+            statement = new SqlStatement<SqlParameter>(@"
 UPDATE products 
 SET name = @name
 WHERE id = @id");
@@ -80,7 +79,7 @@ WHERE id = @id");
 
         public static int deleteProducts(this ITransaction transaction)
         {
-            return transaction.set(new SqlStatement("DELETE FROM products"));
+            return transaction.set(new SqlStatement<SqlParameter>("DELETE FROM products"));
         }
 
         private static void prv_migrate(IDb db, Func<ITransaction, int> transactionDelegate)
@@ -103,7 +102,7 @@ WHERE id = @id");
         {
             ISqlStatement query;
 
-            query = new SqlStatement(@"
+            query = new SqlStatement<SqlParameter>(@"
 CREATE TABLE products
 (
     id BIGINT NOT NULL IDENTITY(1,1),
@@ -117,7 +116,7 @@ CREATE TABLE products
 
         private static int prv_dropProductsTable(ITransaction transaction)
         {
-            return transaction.set(new SqlStatement(@"DROP TABLE products;"));
+            return transaction.set(new SqlStatement<SqlParameter>(@"DROP TABLE products;"));
         }
 
         private static Product prv_buildProduct(IDataRecord r)

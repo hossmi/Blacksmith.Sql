@@ -4,11 +4,13 @@ using Blacksmith.Sql.Extensions.DbCommands;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using Blacksmith.Validations;
 
 namespace Blacksmith.Sql.Models
 {
     internal class Transaction : ITransaction
     {
+        private readonly IValidator assert;
         private IDbTransaction transaction;
         private IDbConnection connection;
         private bool disposed;
@@ -16,6 +18,8 @@ namespace Blacksmith.Sql.Models
 
         public Transaction(Func<IDbConnection> connectionBuilder)
         {
+            this.assert = Asserts.Default;
+            this.assert.isNotNull(connectionBuilder);
             this.connectionBuilder = connectionBuilder;
         }
 
